@@ -1,0 +1,34 @@
+# ── Third-party dependency (clone separately — see README) ───────────────────
+# Upstream SAVAR library: https://github.com/xtibau/savar  (commit 532e5e5)
+savar/
+
+# ── Large generated data, checkpoints, activation caches (regenerate — README) ─
+data/
+sae_data*/
+checkpoints*/
+logs*/
+*.log
+*.pt
+results/ladder_cnn/r4_series_mean.npy
+results/ladder_cnn/r4_footprints.npy
+results/ladder_cnn/r3b_series_*.npy
+results/ladder_gnn/activations_stride1_all.npy
+results/ladder_gnn/Z_stride1_all.npy
+results/ladder_gnn/r4_series_mean_gnn.npy
+results/ladder_gnn/r4_footprints_gnn.npy
+results/ladder_gnn/r3b_series_*.npy
+results/ladder_gnn/DONE
+results/ladder_gnn/log_*.txt
+results/litext_e1_discovery_partial*.npy
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# ── Local editor / agent config ──────────────────────────────────────────────
+.claude/
+.vscode/
+.DS_Store

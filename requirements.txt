@@ -1,0 +1,40 @@
+# Two environments were used; the sections say which one each block belongs to.
+#
+# 1. Demo + figure builders + CPU analyses (Python 3.9 — the versions the demo
+#    notebook and the curated results were produced with):
+#        pip install -r requirements.txt
+#    Skip the "GPU experiments" block below if you only want the demo.
+# 2. GPU experiments (GraphCast rollouts with SAE patching) ran in a separate
+#    Python 3.11 venv; that block lists the versions used there.
+
+# --- demo notebook (notebooks/demo.ipynb) -----------------------------------
+numpy==2.0.2
+scipy==1.13.1
+pandas==2.3.3
+matplotlib==3.9.4
+nbclient==0.10.2
+nbformat==5.10.4
+ipykernel==6.31.0
+jupyter
+
+# --- figure builders (figures/) and causal-graph analyses --------------------
+cartopy>=0.22            # map panels (paper_fig_contrast / paper_fig_graphmap / paper_fig_maps)
+xarray>=2024.7
+scikit-learn==1.6.1
+tigramite==5.2.10.1      # PCMCI+ (hybrid_pcmci, concept graphs)
+networkx==3.2.1
+igraph==1.0.0
+leidenalg==0.12.0
+
+# --- SAE training / torch-side scripts ---------------------------------------
+# CUDA 12.4 build was used (2.6.0+cu124):
+#   pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0
+
+# --- GPU experiments (flagship_sae/, extraction/; Python 3.11 venv) -----------
+# GraphCast 0.25 deg / 37 levels; needs one ~46 GB GPU. Versions from that venv:
+#   jax==0.10.2  jaxlib==0.10.2  dm-haiku==0.0.16  numpy==2.4.6  xarray==2026.7.0
+#   zarr==3.1.6  gcsfs==2026.7.0  cartopy==0.25.0  scipy==1.17.1
+# Install jax for your CUDA per https://jax.readthedocs.io (e.g. pip install "jax[cuda12]"),
+# then:
+#   pip install dm-haiku zarr gcsfs "graphcast @ git+https://github.com/google-deepmind/graphcast.git"

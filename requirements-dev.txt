@@ -1,0 +1,5 @@
+# Tests and the demo notebook runner (on top of requirements.txt)
+pytest>=7
+nbclient==0.10.2
+nbformat==5.10.4
+ipykernel==6.31.0
