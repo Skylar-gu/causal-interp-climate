@@ -6,7 +6,7 @@ Two changes vs `extract_traj_flag.py` (which is left untouched):
    BEFORE the channel projection. The scalar series bakes q_c in
    (`s_c(t) = (p_c^T A_t)·q_c - mbar_c·q_c`), so every new channel-direction hypothesis
    otherwise costs another full multi-hour GPU run. With the pooled tensor on disk a
-   refit is a CPU dot product (`reproject_flag.py` (not in the release)).
+   refit is a CPU dot product (`reproject_flag.py` (not included here)).
    Cost: T·N·512·2 bytes/member  (T=8768, N=39 -> 350 MB/member).
 
 2. **Pipelined prefetch.** The v1 loop was strictly serial:

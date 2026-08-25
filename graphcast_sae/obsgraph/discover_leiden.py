@@ -1,7 +1,4 @@
-"""Copied verbatim from the SAVAR validation repo (`sae/discover_leiden.py`) on 2026-08-25;
-only the module docstring below was touched.
-
-Unknown-N mode discovery via community detection (litext plan R4 SCALE row;
+"""Unknown-N mode discovery via community detection (shared with the SAVAR validation code) (litext plan R4 SCALE row;
 Stage-1 route "b" in internal design notes (not shipped), and the
 Ising/Leiden composition of internal design notes (not shipped)).
 

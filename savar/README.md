@@ -7,8 +7,7 @@ on it, and the SAE → PCMCI+ ladder that asks whether a forecaster's internal r
 exposes that graph once every oracle ingredient is removed.
 
 This is the minimal subset of the public
-[`savar-validation`](https://github.com/Skylar-gu/savar-validation) repository (branch
-`refactor/minimal-package`); the many dataset variants, probes, steering and VPD experiments
+[`savar-validation`](https://github.com/Skylar-gu/savar-validation) repository; the many dataset variants, probes, steering and VPD experiments
 that do not feed a paper number are left out.
 
 ## Paper number → script → artifact
@@ -25,8 +24,7 @@ that do not feed a paper number are left out.
 | PCMCI baseline on Z, base data: F1 0.825 (the ladder gate) | — | `pcmci/run_pcmci.py` | `results/pcmci_results.npy` |
 | 0/8 per-mode SAE features monosemantic; PC0 share 86 % (CNN) / 88–92 % (GNN) | caption | `sae/eval_sae_per_mode.py` (`--gnn --datadir sae_data/hetdynamics_eqvar` for the GNN) | `notes/phase7_sae_findings.md` |
 
-Every value in the table was re-read from the shipped `.npy` files when this package was
-assembled (e.g. `ladder_r0_r3_base.npy` → R3b 0.128, trueZ 0.8249; `nulls_base.npy` → p 0.033;
+Every value in the table can be re-read from the shipped `.npy` files (e.g. `ladder_r0_r3_base.npy` → R3b 0.128, trueZ 0.8249; `nulls_base.npy` → p 0.033;
 `ladder_gnn_eqvar_plus.npy` → trueZ 0.859, R3b 0.003).
 
 ## Layout

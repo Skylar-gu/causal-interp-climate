@@ -1,4 +1,4 @@
-*Copied verbatim from the main repo's `notes/` on 2026-08-25. Script paths refer to the pre-release layout (`flagship_sae/` is now `graphcast_sae/`, regrouped by experiment).*
+*Historical document, kept as written; script paths refer to the earlier layout (`flagship_sae/` is now `graphcast_sae/`, regrouped by experiment).*
 
 # PREREG — the flagship watching-graph Ĝ_int (FG-1 … FG-9)
 
