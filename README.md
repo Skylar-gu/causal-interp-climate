@@ -42,9 +42,9 @@ data/             mesh geometry, per-feature footprints, land-sea mask
 notebooks/        demo.ipynb (executed)
 ```
 
-## Re-running the GPU experiments
+## Running the GPU experiments
 
-The heavy experiments (48–120 h GraphCast rollouts with SAE patching) need one
+The larger GraphCast rollouts experiments need one
 ~46 GB GPU and three public assets not shipped here:
 
 - **GraphCast weights** (0.25°, 37 levels): from the DeepMind GraphCast release.
