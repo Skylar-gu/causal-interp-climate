@@ -1,6 +1,4 @@
-# causal-interpretability-for-climate
-
-Causal discovery and interventions inside GraphCast 
+# Causal discovery and interventions inside weather forecasting models 
 
 ## Quick start — demo
 
