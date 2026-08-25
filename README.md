@@ -42,19 +42,6 @@ data/             mesh geometry, per-feature footprints, land-sea mask
 notebooks/        demo.ipynb (executed)
 ```
 
-## Paper figures
-
-Each `figures/paper_fig_*.py` writes a PDF and PNG file. The ones the paper includes, with their inputs:
-
-| figure | inputs |
-|---|---|
-| `paper_fig_contrast` | `results/fs_contrast_inputs.npy` (RESPOP response table + the drawn Δz500 slice), `results/skill/convection/` |
-| `paper_fig_gain` | `results/skill/gain_conv/` |
-| `paper_fig_graphmap` | `results/fs_graphmap_inputs.npy` (consensus graph, footprints, residual edges) |
-| `paper_fig_savar` | numbers transcribed in the script header (SAVAR calibration, see `savar/`) |
-
-`paper_fig_contrast` and `paper_fig_graphmap` draw maps and need `cartopy`.
-
 ## Re-running the GPU experiments
 
 The heavy experiments (48–120 h GraphCast rollouts with SAE patching) need one
