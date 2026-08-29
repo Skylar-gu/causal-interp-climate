@@ -10,10 +10,12 @@ jupyter notebook notebooks/demo.ipynb     # or: run all cells
 `notebooks/demo.ipynb` runs on **CPU in a few minutes** and regenerates, from the
 result files shipped here:
 
-1. the Ida dial-up progression figure (each genesis ingredient doubled, watched
-   on the model's internal cyclone feature at +12/+24/+36/+48 h),
-2. the seven-storm mechanism-ablation table (deepening lost vs ERA5),
-3. the convection gain-sweep curves (Ida / Haishen / Patricia, with optima),
+1. the Ida dial-up progression figure (each calibrated genesis-ingredient group
+   doubled, watched on the model's internal cyclone feature at +12/+24/+36/+48 h),
+2. the seven-storm mechanism-ablation table (deepening lost vs ERA5) for the
+   convection triplet, the low-level-spin group and its single storm-core feature
+   f3316, and the calibrated moisture group,
+3. the gain-sweep curves for convection and for f3316 (Ida / Haishen / Patricia),
 4. the grid-locked features: world maps of their footprints, single-feature and
    group ablation tables against matched controls,
 
@@ -36,7 +38,8 @@ graphcast_sae/    the experiment code, one subpackage per experiment (run as
   legacy/         superseded lanes kept for provenance (steering, mega battery)
 docs/prereg/      the pre-registrations the scripts cite; docs/notes/ the cited notes
 tests/            CPU self-tests
-figures/          figure builders whose inputs ship in results/, plus the paper's PDFs
+figures/          the paper's figure PDFs and their builders (figures/main_claims/ holds
+                  Figs 1-3 as the web-rendered print PDFs + the HTML they render from)
 results/          curated result files (verdicts, sweeps, scores, ablation arms)
 data/             mesh geometry, per-feature footprints, land-sea mask
 notebooks/        demo.ipynb (executed)

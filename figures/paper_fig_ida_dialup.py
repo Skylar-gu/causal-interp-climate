@@ -18,7 +18,9 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 
 ROOT = Path(__file__).resolve().parent.parent
-d = np.load(ROOT / "results/fs_ida_mechmaps_prog.npy", allow_pickle=True).item()
+import os
+TAG = os.environ.get("MECHMAPS_TAG", "_v2")   # "_v2" = calibrated groups (paper); "" = the original 39c8e9b groups
+d = np.load(ROOT / f"results/fs_ida_mechmaps_prog{TAG}.npy", allow_pickle=True).item()
 lsm = np.load(ROOT / "results/land_sea_mask_025.npz")
 
 mlat, mlon = d["mlat"], d["mlon"]

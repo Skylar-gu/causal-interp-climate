@@ -8,7 +8,7 @@ Fork of ida_mechmaps.py with two changes for the paper figure rebuild:
 
 Paper: Fig. 5, Ida dial-up (figures/paper_fig_ida_dialup.py)
 Inputs: GraphCast params (GRAPHCAST_PARAMS)
-Outputs: results/fs_ida_mechmaps_prog.npy
+Outputs: results/fs_ida_mechmaps_prog<MECHMAPS_TAG>.npy (shipped: _v2 = calibrated groups, "" = the 39c8e9b groups)
 Run:   # JAX env, GPU (~46 GB)
     FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false python -m graphcast_sae.storms.ida_mechmaps_prog
 """
@@ -23,6 +23,13 @@ TC = 3243; IC = "2021-08-26"; H = 8; DOSE = 1.0
 MECH = {"convection": [2401, 2067, 3174], "moisture": [3501, 845],
         "vorticity": [3861, 2514, 2089], "shear": [1996, 2349, 744]}
 REG = dict(lat=(0, 40), lon=(-110, -40))
+# Calibrated-group override (2026-08-29): MECHMAPS_GROUPS='{"convection":[...],...}' and MECHMAPS_TAG='_v2'
+# write results/fs_ida_mechmaps_prog<TAG>.npy. The shipped _v2 file used
+#   {"convection":[2401,2067,3174],"moisture":[2415,3780,1829],"vorticity":[2089,2514,3316],"shear":[1996,3460]}
+import json as _json
+TAG = os.environ.get("MECHMAPS_TAG", "")
+if os.environ.get("MECHMAPS_GROUPS"): MECH = {k: [int(f) for f in v] for k, v in _json.loads(os.environ["MECHMAPS_GROUPS"]).items()}
+assert TC not in [f for g in MECH.values() for f in g], "outcome feature inside a mechanism group"
 CAP = [1, 3, 5, 7]          # capture leads: (h+1)*6 h = +12/+24/+36/+48
 
 def numpyify(ds):
@@ -81,8 +88,8 @@ def main():
         frames, _ = roll(fc.coef_patch(sae, g, DOSE), [TC])
         out[f"tc_{m}"] = {lead: fr[TC] for lead, fr in frames.items()}
         print(f"  dose {m}: TC +48h sum {out[f'tc_{m}'][48].sum():.0f} (base {out['tc_base'][48].sum():.0f})", flush=True)
-    np.save(fc.ROOT / "results/fs_ida_mechmaps_prog.npy", out, allow_pickle=True)
-    print("-> results/fs_ida_mechmaps_prog.npy", flush=True)
+    np.save(fc.ROOT / f"results/fs_ida_mechmaps_prog{TAG}.npy", out, allow_pickle=True)
+    print(f"-> results/fs_ida_mechmaps_prog{TAG}.npy", flush=True)
 
 if __name__ == "__main__":
     main()

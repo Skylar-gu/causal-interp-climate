@@ -10,8 +10,8 @@ right  change in global RMSE at +48 h for each output field when the single feat
        The grid-locked score under the chart is the minimum positional score over the five
        rotation angles (45/90/135/180/270 deg; results/fs_rotation_all*.npy).
 
-Data: results/fs_matched_rmse.npy (+ fs_matched_rmse_six.npy when present) in causal-graphcast.
-Needs cartopy -> .venv-jax/bin/python figures/paper_fig_gridlocked_effects.py [f2954 f2075 ...] [--vs-baseline]
+Data: results/fs_matched_rmse.npy (+ fs_matched_rmse_six.npy when present).
+Needs cartopy -> python figures/paper_fig_gridlocked_effects.py [f2954 f2075 ...] [--vs-baseline]
   --vs-baseline  bars are feature-ablated minus the UNTOUCHED forecast (no control subtracted);
                  writes paper_fig_gridlocked_effects_vs_baseline.*
 """
@@ -22,17 +22,15 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib import font_manager as _fm
-for _f in __import__("glob").glob(__import__("os").path.expanduser("~/.fonts/IBMPlexSans-*.ttf")):
-    _fm.fontManager.addfont(_f)
-plt.rcParams["font.family"] = "IBM Plex Sans"   # the clean-paper figures' face
+plt.rcParams["font.family"] = ["IBM Plex Sans", "DejaVu Sans"]   # the clean-paper figures' face, if installed
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 from scipy.spatial import cKDTree
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
 ROOT = Path(__file__).resolve().parent.parent
-MAIN = Path("/home/ec2-user/causal-graphcast")
+MAIN = ROOT   # inputs read from this repo's results/ (fs_matched_rmse.npy ships; the rotation-angle and
+              # hybrid-fires files do not -- the shipped PDF is the paper's Fig. 7)
 sys.path.insert(0, str(ROOT / "figures"))
 from paper_palette import BG, INK, MUTED, FAINT, GRIDC, BLUE, GREY, PALE  # noqa: E402
 
