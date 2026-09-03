@@ -21,24 +21,26 @@ result files shipped here:
 
 ## Repository structure
 
-graphcast_sae/    GraphCast SAE experiments
-  common/         shared utilities and storm metadata
-  weights/        pretrained layer-8 SAE
-  extraction/     activation extraction
-  atlas/          feature labelling and calibration
-  storms/         tropical-cyclone interventions
-  gridlock/       grid-locked feature analyses and controls
-  appendix/       supporting analyses
+```
+graphcast_sae/       GraphCast SAE experiments
+  common/            shared utilities and storm metadata
+  weights/           pretrained layer-8 SAE
+  extraction/        activation extraction
+  atlas/             feature labelling and calibration
+  storms/            tropical-cyclone interventions
+  gridlock/          grid-locked feature analyses and controls
+  appendix/          supporting analyses
 
-figures/          paper figures and builders
-results/          curated experiment outputs
-data/             mesh geometry and feature metadata
-docs/prereg/      preregistrations
-tests/            self-tests
-notebooks/        demo notebook
+figures/             paper figures and builders
+results/             curated experiment outputs
+data/                mesh geometry and feature metadata
+docs/prereg/         preregistrations
+tests/               self-tests
+notebooks/           demo notebook
 
-savar/, obsgraph/, concepts/, heatdome/, legacy/
-                  additional and superseded experiments not used in the current paper
+savar/, graphcast_sae/{obsgraph,concepts}/, graphcast_sae/{heatdome,legacy}/
+                     additional and superseded experiments not used in the current paper
+```
 
 ## Running the GPU experiments
 
