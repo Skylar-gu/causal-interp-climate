@@ -19,44 +19,26 @@ result files shipped here:
    group ablation tables against matched controls,
 
 
-## Layout
+## Repository structure
 
-The code is two experiment lanes. The current paper is the **interventions + grid-locked
-features** lane; the **causal-discovery** lane (SAVAR ground truth, the observational PCMCI+
-graph) is kept for provenance but is not in the current draft.
+graphcast_sae/    GraphCast SAE experiments
+  common/         shared utilities and storm metadata
+  weights/        pretrained layer-8 SAE
+  extraction/     activation extraction
+  atlas/          feature labelling and calibration
+  storms/         tropical-cyclone interventions
+  gridlock/       grid-locked feature analyses and controls
+  appendix/       supporting analyses
 
-```
-graphcast_sae/    experiment code, one subpackage per experiment (run as
-                  `python -m graphcast_sae.<group>.<script>` from the repo root)
+figures/          paper figures and builders
+results/          curated experiment outputs
+data/             mesh geometry and feature metadata
+docs/prereg/      preregistrations
+tests/            self-tests
+notebooks/        demo notebook
 
-  # shared
-  common/         shared machinery (fs_common), storm registries, signature physics
-  weights/        the published SAE (TopK, k=32, dict 4096, layer 8) + config
-  extraction/     layer-8 activation dumps (mini_* = the graphcast_small lane)
-
-  # interventions + grid-locked features  — the current paper
-  atlas/          feature labelling / calibration (mechanism / physics atlas)
-  storms/         seven-storm mechanism ablations, Ida dial-up, gain sweep
-  gridlock/       grid-locked features: scores, matched controls, ablations
-  appendix/       supporting analyses (parity, mediation, locality, skill)
-
-  # causal discovery  — not in the current draft
-  obsgraph/       observational graph (pool, 12-yr trajectory, PCMCI+ hybrid)
-  concepts/       purified concept groups and their response operators
-
-  # other
-  heatdome/       2021 heat-dome blocking study (results shipped; not in the paper)
-  legacy/         superseded lanes kept for provenance (steering, mega battery)
-
-savar/            causal-discovery lane: SAVAR benchmark, CNN/GNN forecasters, SAE ladders
-docs/prereg/      the pre-registrations the scripts cite; docs/notes/ the cited notes
-tests/            CPU self-tests
-figures/          the paper's figure PDFs and their builders (figures/main_claims/ holds
-                  the web-rendered print PDFs + the HTML they render from)
-results/          curated result files (verdicts, sweeps, scores, ablation arms)
-data/             mesh geometry, per-feature footprints, land-sea mask
-notebooks/        demo.ipynb (executed)
-```
+savar/, obsgraph/, concepts/, heatdome/, legacy/
+                  additional and superseded experiments not used in the current paper
 
 ## Running the GPU experiments
 
