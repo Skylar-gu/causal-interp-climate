@@ -30,3 +30,11 @@ intensification window, exactly `make_figures.gain_curve`. The random control ar
 `results/skill/gain_3316/run_*.npy`, `out/gain_3316.log`; consumed by
 `figures/main_claims/build_figure2p5.py` → `figure2p5_web_notitle_print.html` →
 `figure2p5_interventions_notitle.pdf` (also copied to `paper_clean/images/`).
+
+## AMENDMENT 1 (2026-08-29, after the ×3 sweep; before the extension runs)
+
+All three storms were still improving at ×3 with no turnover. Extension on Ida only:
+`MECH_NAME=gain_3316_ext MECH_FEATS=3316 MECH_GAINS=3.5,4,4.5,5` (same protocol, its own
+baseline arm). Reading, fixed now: the curve's minimum is the first gain after which error rises
+by more than the 0.15 hPa nondeterminism floor for two consecutive gains; if error is still
+falling at ×5 the minimum is reported as "> ×5, not reached".
