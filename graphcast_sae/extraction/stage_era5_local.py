@@ -1,5 +1,5 @@
 """Stage a SPARSE local copy of the WB2 0.25°/37-lev ERA5 zarr for clusters whose compute
-nodes have no internet (Rorqual, 2026-10-12; docs/notes/spec_cluster_port.md §3).
+nodes have no internet (Rorqual, 2026-10-12).
 
 Copies raw chunk objects only -- no decode, no re-encode -- so the local store is the remote
 store byte-for-byte at the requested timestamps. Every time-dependent variable is chunked

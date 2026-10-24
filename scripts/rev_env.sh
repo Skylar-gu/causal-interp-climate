@@ -1,6 +1,6 @@
 # Common environment for the camera-ready revision jobs on Rorqual (source, don't run).
 # Alliance's PYTHONPATH injects a _manylinux override and its own site-packages; the venv is a
-# plain PyPI build of env/requirements-jax-freeze.txt, so keep them out.
+# plain PyPI build of env/requirements-jax.txt, so keep them out.
 unset PYTHONPATH PIP_CONFIG_FILE
 REPO=${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
 export GC_SCRATCH=${GC_SCRATCH:?set GC_SCRATCH to the scratch root (graphcast_sae/paths.py)}

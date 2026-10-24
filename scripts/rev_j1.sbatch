@@ -5,7 +5,7 @@
 #SBATCH --array=0-7
 #SBATCH -o out/rev_j1_%A_%a.log
 # J1 (+J3) controlled gain sweep. One task per STORM; every arm of a storm in one invocation
-# (spec_cluster_port.md: array parallelism is per storm, never per arm).
+# (array parallelism is per storm, never per arm).
 # Launch task 0 (Ida) alone first: it is the timing probe and sanity gates 2-3.
 source "$SLURM_SUBMIT_DIR/scripts/rev_env.sh"   # submit from the repository root
 STORMS=(ida2021 michael2018 haishen2020 goni2020 haiyan2013 patricia2015 wilma2005 nondev2013)

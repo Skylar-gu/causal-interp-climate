@@ -16,9 +16,7 @@ Throughout the docs these are written `$PY_JAX` and `$PY_TORCH`.
 - `requirements-jax.txt` / `requirements-torch.txt` — **curated**: the packages the code
   actually imports, at the exact versions the published results were produced with. Use
   these.
-- `requirements-jax-freeze.txt` / `requirements-torch-freeze.txt` — full `pip freeze` of
-  both live environments, transitive deps included. Use these only if the curated install
-  resolves to something that misbehaves; they are the ground truth of what ran.
+
 
 ## JAX / GraphCast env
 

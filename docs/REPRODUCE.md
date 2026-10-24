@@ -46,38 +46,31 @@ same shipped files.
 
 ## Camera-ready revision runs (J1–J7)
 
-Run on an H100 cluster after review, under `docs/prereg/prereg_cluster_revision.md` (frozen
-before any number) and amendments 1–3; the result record is
-`docs/notes/result_cluster_revision_2026_10_12.md`, the plan `docs/notes/spec_cluster_port.md`.
-SLURM launchers are in `scripts/` (`rev_env.sh` + `rev_*.sbatch`; submit from the repository
-root, `mkdir -p out` once). All but J4 use `XLA_FLAGS=--xla_gpu_deterministic_ops=true`
-(amendment 3); arms are only ever differenced within one run.
+GPU jobs run after review under `docs/prereg/prereg_cluster_revision.md` (pass/fail bars
+committed before any run) and its amendments 1–3; results are summarised in
+`docs/notes/result_cluster_revision_2026_10_12.md`. Launchers: `scripts/rev_env.sh` +
+`scripts/rev_j*.sbatch` (submit from the repository root). All but J4 use deterministic GPU ops.
 
-| job | what | launcher → scorer | shipped result |
+| job | what | scorer | result |
 |---|---|---|---|
-| J1 (+J3) | convection gain sweep α ∈ {0, 0.5, 1, 1.25, 1.5, 2, 2.5, 3} on 7 storms + non-developer, in-box matched control at every gain; TC feature 3243 read before the patch (J3) | `rev_j1.sbatch` (GPU `storms.skill_conv_run`) → `MECH_RES=suff_ctl storms.rev_analyze j1` | `results/skill/suff_ctl/rev_verdict.json`, `rev_analysis.txt` (paper Fig. 2, Tab. 1) |
-| J2 | random-direction and difference-of-means baselines at matched per-node magnitude | `rev_j2.sbatch` | `results/skill/dirs_j2/` |
-| J4 | run-to-run floor: 5 copies of two arms, default XLA | `rev_j4.sbatch` → `storms.rev_analyze j4` | `results/skill/determinism_j4/rev_verdict.json` (0.25 hPa) |
-| J6 | feature 2954: zero vs mean ablation, 6 ICs | `rev_j6.sbatch` (GPU `gridlock.global_rmse_ablate`) | `results/fs_j6_ablation_type.npy`, `j6_status.txt`, `j6_groups.json` |
-| J7 | J1 on five Southern Hemisphere storms | `rev_j7.sbatch` → `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/` |
-| gate 2 | zero-patch identity under default vs deterministic XLA | `rev_gate2_det.sbatch` | `results/skill/suff_ctl_nondet/` (default XLA, failed; its `err_red`/`spec` fields were scored before the metric fix and hold the min-MSLP RMSE metric) |
+| J1 (+J3) | convection gain sweep α ∈ {0, 0.5, 1, 1.25, 1.5, 2, 2.5, 3}, in-box control at every gain; TC feature read before the patch | `MECH_RES=suff_ctl storms.rev_analyze j1` | `results/skill/suff_ctl/rev_verdict.json` (Fig. 2, Tab. 1) |
+| J2 | random and difference-of-means directions | `MECH_RES=dirs_j2 storms.rev_analyze j2` | `results/skill/dirs_j2/rev_verdict.json` |
+| J4 | run-to-run floor (5 replicates, default GPU ops) | `MECH_RES=determinism_j4 storms.rev_analyze j4` | `results/skill/determinism_j4/rev_verdict.json` |
+| J6 | feature 2954, zero vs mean ablation | `gridlock.global_rmse_ablate` | `results/fs_j6_ablation_type.npy` |
+| J7 | J1 on five Southern Hemisphere storms | `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/rev_verdict.json` |
 
-Compute nodes without internet read ERA5 from a sparse local copy:
-`python -m graphcast_sae.extraction.stage_era5_local --out $GC_SCRATCH/era5_wb2.zarr`
-on a node with internet, then `FS_ERA5_LOCAL` (set in `rev_env.sh`). Exact environments are
-in `env/`.
+`storms.offmanifold_check` compares the steered codes with the i.i.d. catalog maximum
+(`results/offmanifold_check.json`). Clusters without internet: stage ERA5 with
+`extraction.stage_era5_local` and set `FS_ERA5_LOCAL`.
 
-The same pass shipped the inputs behind the paper's other camera-ready numbers:
-grid-lock rotation scores at five angles (`results/fs_rotation_all*.npy`,
-`gridlock.rotation_angles_summary`, `docs/notes/rotation_angles_2026_08_25.md`), the six
-grid-locked features against matched controls (`results/fs_matched_rmse_six.npy`,
-`matched_controls_six.json`, `gridlock.matched_control_draw_six`, `scripts/ablate_six.sh`),
-the 16 concept-group restore-to-normal batteries (`results/skill/mech_*`, `moisture`,
-`docs/notes/mechanism_library_2026_08_17.md`), core activation and core-matched controls
-(`results/fs_core_scan.npy`, `core_control*.json`, `results/skill/conv_corectl{2,4}`,
-`storms.core_control_all`), the in-box controls (`results/inbox_control_*.json`,
-`results/skill/convection_inboxctl`), the disk-radius sweep (`results/skill/conv_radius_sweep.json`)
-and the HRES / best-track comparison (`results/hres_compare.npy`, `docs/notes/result_hres_gap.md`).
+Other camera-ready inputs: five-angle grid-lock scores (`results/fs_rotation_all*.npy`,
+`gridlock.rotation_angles_summary`, `scripts/rot_angles.sh`); the six grid-locked features
+against matched controls (`results/fs_matched_rmse_six.npy`, `matched_controls_six.json`,
+`scripts/ablate_six.sh`); the 16 concept-group batteries (`results/skill/mech_*`, `moisture`);
+core firing and core-matched controls (`results/fs_core_scan.npy`, `core_control*.json`,
+`results/skill/conv_corectl{2,4}`); in-box controls (`results/inbox_control_*.json`); the
+disk-radius sweep (`results/skill/conv_radius_sweep.json`); HRES / best track
+(`results/hres_compare.npy`).
 
 App. Fig. 4 (grid-locked effects, six features × seven fields) and App. Fig. 5 (the same
 features as a per-gridpoint $z_{500}$ error map) are in the appendix table below.
