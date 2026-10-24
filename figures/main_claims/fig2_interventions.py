@@ -1,9 +1,12 @@
-"""Figure 2 rebuilt from the J1 controlled gain sweep (Rorqual H100, deterministic ops).
+"""Figure 2: the convection group from the J1 controlled gain sweep (panels a-c) and the
+low-level-spin feature 3316 gain sweep (panel d).
 
-Every storm is drawn at every gain, against the in-box control at the same gain, so the
-figure shows the outcome distribution rather than the best storm.
+Panels a-c draw every storm at every gain, against the in-box control at the same gain, so the
+figure shows the outcome distribution rather than the best storm. Panel d is the single spin
+feature on the three storms it was swept on, with its random-feature control arms.
 
-Data: results/skill/suff_ctl/rev_verdict.json (fb11347), floor from J4 (0.25 hPa).
+Data: results/skill/suff_ctl/rev_verdict.json (a-c), results/skill/gain_3316/run_*.npy +
+era5_truth.npy (d, prereg docs/prereg/prereg_gain_3316.md); floor from J4 (0.25 hPa).
 Run from the repository root: python figures/main_claims/fig2_interventions.py
 
 Outputs: figures/main_claims/fig2_interventions.{pdf,png}
@@ -64,6 +67,25 @@ def pct_era(s, g):
     return 100 * arm(s, g)["deepen"] / M[s]["era_deepen"]
 
 
+# d: feature 3316 sweep. Same deepening-error metric as rev_analyze.arm_metrics
+SPIN = ROOT / "results/skill/gain_3316"
+SPIN_STORMS = ["ida2021", "haishen2020", "patricia2015"]
+SPIN_GAINS = [0, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
+SPIN_TRUTH = np.load(SPIN / "era5_truth.npy", allow_pickle=True).item()
+
+
+def spin_dep_err(s, arm_name):
+    t = np.asarray(SPIN_TRUTH[s]["mslp_min"]); ic = float(t[0])
+    m = np.asarray(np.load(SPIN / f"run_{s}.npy", allow_pickle=True).item()["res"][arm_name]["mslp_min"])
+    assert np.isfinite(m).all(), (s, arm_name)
+    return abs((ic - t.min()) - (ic - m.min()))
+
+
+def spin_red(s, g):
+    a = "baseline" if g == 1 else "gain-%g" % g
+    return spin_dep_err(s, "baseline") - spin_dep_err(s, a)
+
+
 def dress(ax, title, sub, xlabel="", ylabel="", grid="y"):
     ax.set_facecolor(BG)
     ax.set_title(title, fontsize=TITLE, color=INK, weight="bold", pad=16, loc="left")
@@ -85,7 +107,7 @@ def gain_axis(ax):
     ax.axvline(1, color=GRIDC, lw=.8, zorder=1)
 
 
-def end_labels(ax, ends, minsep):
+def end_labels(ax, ends, minsep, over=OVER):
     """Label each storm at the right end of its line, spread apart by minsep (data units)."""
     ends = sorted(ends, key=lambda kv: kv[1])
     pos = [y for _, y in ends]
@@ -96,12 +118,12 @@ def end_labels(ax, ends, minsep):
                 pos[i - 1], pos[i] = mid - minsep / 2, mid + minsep / 2
     for (s, _), y in zip(ends, pos):
         ax.text(GAINS[-1] + .07, y, NICE[s], fontsize=NOTE - .6, va="center", ha="left",
-                color=SALMON if s in OVER else FAINT)
+                color=SALMON if s in over else FAINT)
 
 
 def figure2():
-    fig, axes = plt.subplots(1, 3, figsize=(7.6, 2.75), facecolor=BG,
-                             gridspec_kw=dict(width_ratios=[.92, 1.1, 1.1]))
+    fig, axes = plt.subplots(1, 4, figsize=(10.0, 2.75), facecolor=BG,
+                             gridspec_kw=dict(width_ratios=[.92, 1.1, 1.1, 1.1]))
 
     # a: restore to normal, treatment vs in-box control, per storm
     ax = axes[0]
@@ -162,7 +184,27 @@ def figure2():
           "near-ERA5 storms overshoot",
           "convection scaling ($\\alpha$)", "deepening (% of ERA5)")
 
-    fig.subplots_adjust(left=.085, right=.955, top=.80, bottom=.17, wspace=.52)
+    # d: low-level spin feature 3316, three storms, random-feature control at alpha = 0 and 3
+    ax = axes[3]
+    ax.axhspan(-FLOOR, FLOOR, color=GRIDC, alpha=.8, lw=0, zorder=1)
+    ax.axhline(0, color=GREY, lw=.6, zorder=2)
+    ends = []
+    for s in SPIN_STORMS:
+        e = [spin_red(s, g) for g in SPIN_GAINS]
+        ax.plot(SPIN_GAINS, e, color=BLUE, lw=1.1, marker="o", ms=2.2, zorder=4)
+        ends.append((s, e[-1]))
+        for g, arm_name in ((0, "rand-normal"), (3, "rand-gain-3")):
+            ax.scatter([g], [spin_dep_err(s, "baseline") - spin_dep_err(s, arm_name)], s=13,
+                       facecolor=BG, edgecolor=GREY, linewidth=.8, zorder=5)
+    ax.scatter([], [], s=13, facecolor=BG, edgecolor=GREY, linewidth=.8, label="random control")
+    end_labels(ax, ends, 1.4, over=())
+    gain_axis(ax); ax.set_ylim(-9, 15)
+    dress(ax, "d  Low-level spin (f3316)",
+          "three storms; no overshoot to $\\alpha=3$",
+          "spin scaling ($\\alpha$)", "deepening error reduced (hPa)")
+    ax.legend(frameon=False, fontsize=NOTE, loc="upper left", handletextpad=.2, borderpad=0)
+
+    fig.subplots_adjust(left=.065, right=.965, top=.80, bottom=.17, wspace=.52)
     for ext, kw in (("pdf", {}), ("png", {"dpi": 300})):
         fig.savefig(HERE / f"fig2_interventions.{ext}", facecolor=BG,
                     bbox_inches="tight", **kw)
@@ -171,6 +213,7 @@ def figure2():
     print("b median by gain", dict(zip(GAINS, np.round(med, 2))))
     print("b control median", dict(zip(GAINS, np.round(cmed, 2))))
     print("c median %ERA5", dict(zip(GAINS, np.round(pm, 0))))
+    print("d spin 3316", {NICE[s]: [round(spin_red(s, g), 2) for g in SPIN_GAINS] for s in SPIN_STORMS})
 
 
 if __name__ == "__main__":
