@@ -37,5 +37,6 @@ restore-to-normal counterfactual every arm reuses) → `MECHMAPS_TAG=_v2 MECHMAP
 Camera-ready revision (J1–J7, `docs/prereg/prereg_cluster_revision.md`): `skill_conv_run.py`
 with `MECH_GAINS` / `MECH_CTL_ALL_GAINS` / `MECH_PRE` / `MECH_FIELDS` (launchers
 `scripts/rev_*.sbatch`) → `rev_analyze.py` → `results/skill/{suff_ctl,sh_suff_ctl,determinism_j4}/rev_verdict.json`.
+Off-distribution check for the gain sweeps: `offmanifold_check.py` → `results/offmanifold_check.json`.
 Core-matched control: `core_scan.py` → `core_control.py` (superseded: matched 3 of 7 storms) /
 `core_control_all.py`.
