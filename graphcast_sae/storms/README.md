@@ -33,3 +33,9 @@ Ida dial-up (Fig. 5): `ida_scan.py` (the local cast) → `steer_ida_counterfactu
 restore-to-normal counterfactual every arm reuses) → `MECHMAPS_TAG=_v2 MECHMAPS_GROUPS=… ida_mechmaps_prog.py`
 → `results/fs_ida_mechmaps_prog_v2.npy` → `figures/paper_fig_ida_dialup.py`
 (`results/fs_ida_mechmaps_prog.npy` is the original, uncalibrated-group run).
+
+Camera-ready revision (J1–J7, `docs/prereg/prereg_cluster_revision.md`): `skill_conv_run.py`
+with `MECH_GAINS` / `MECH_CTL_ALL_GAINS` / `MECH_PRE` / `MECH_FIELDS` (launchers
+`scripts/rev_*.sbatch`) → `rev_analyze.py` → `results/skill/{suff_ctl,sh_suff_ctl,determinism_j4}/rev_verdict.json`.
+Core-matched control: `core_scan.py` → `core_control.py` (superseded: matched 3 of 7 storms) /
+`core_control_all.py`.

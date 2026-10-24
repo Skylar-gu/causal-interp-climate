@@ -1,0 +1,2 @@
+# Figure sources: HTML pages printed to the paper PDFs, not code. Keep them out of the language bar.
+figures/**/*.html linguist-detectable=false

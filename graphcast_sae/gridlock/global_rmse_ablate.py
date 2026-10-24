@@ -45,6 +45,7 @@ os.environ["FS_DEVICE"] = "gpu"
 os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
 
 import numpy as np
+import jax.numpy as jnp
 import xarray as xr
 import graphcast_sae.common.fs_common as fc
 from graphcast import data_utils, rollout
@@ -109,6 +110,21 @@ def main():
     noop = fc.noop_patch(sae)
     patches = {k: (noop if v is None else fc.coef_patch(sae, v, -1.0))
                for k, v in ARMS}
+    # MEAN ABLATION (added 2026-10-12, revision J6). An arm named mean_* / ctrl_mean_* replaces
+    # each feature with its UNCONDITIONAL dataset mean instead of zero: coef -1 removes f*d_f at
+    # every node and the spatially uniform uvec adds mu_f*d_f back. mu_f = ssum / (n_windows *
+    # N_MESH) from results/fs_feature_magnitude_stats.npy (cov = cnt/(160*40962) confirms that
+    # denominator). Same compiled graph as the zero arms: only runtime arrays differ.
+    if any(k.startswith(("mean_", "ctrl_mean_")) for k, _ in ARMS):
+        st = np.load(fc.ROOT / "results/fs_feature_magnitude_stats.npy", allow_pickle=True).item()
+        mu = np.asarray(st["ssum"], np.float64) / (int(st["n_windows"]) * fc.N_MESH)
+        Wd = np.asarray(sae.W_dec, np.float64)
+        for k, v in ARMS:
+            if k.startswith(("mean_", "ctrl_mean_")):
+                coef, rho, _ = patches[k]
+                uvec = sum(mu[f] * Wd[:, f] for f in v).astype(np.float32)
+                patches[k] = (coef, rho, jnp.asarray(uvec))
+                log(f"   {k}: mean ablation, mu = {[round(float(mu[f]), 4) for f in v]}")
 
     # PER-IC storage, not a running mean. Every arm sees the SAME initial conditions, so the
     # comparison is PAIRED: for a given IC the arm and its control forecast identical weather

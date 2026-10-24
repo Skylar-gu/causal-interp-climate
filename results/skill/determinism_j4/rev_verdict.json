@@ -1,0 +1,66 @@
+{
+ "per_storm": {
+  "ida2021": {
+   "baseline": {
+    "n": 5,
+    "deepen": [
+     6.724040527343732,
+     6.764431152343718,
+     6.818337402343786,
+     6.774978027343764,
+     6.7154467773438
+    ],
+    "deepen_range": 0.10289062499998636,
+    "max_pairwise_traj_hpa": 0.20007812500000455,
+    "bit_identical": false
+   },
+   "conv-normal": {
+    "n": 5,
+    "deepen": [
+     3.864353027343782,
+     3.870134277343709,
+     3.8470092773437727,
+     3.8304467773436954,
+     3.8335717773437636
+    ],
+    "deepen_range": 0.03968750000001364,
+    "max_pairwise_traj_hpa": 0.12046874999998636,
+    "bit_identical": false
+   }
+  },
+  "patricia2015": {
+   "baseline": {
+    "n": 5,
+    "deepen": [
+     5.3944653320312455,
+     5.291574707031259,
+     5.269309082031214,
+     5.3945434570312045,
+     5.369777832031218
+    ],
+    "deepen_range": 0.1252343749999909,
+    "max_pairwise_traj_hpa": 0.18226562500001364,
+    "bit_identical": false
+   },
+   "conv-normal": {
+    "n": 5,
+    "deepen": [
+     5.1625903320313,
+     5.147043457031259,
+     5.125168457031236,
+     5.198449707031273,
+     5.1573559570312
+    ],
+    "deepen_range": 0.07328125000003638,
+    "max_pairwise_traj_hpa": 0.1408593749999909,
+    "bit_identical": false
+   }
+  }
+ },
+ "floor": {
+  "deepen_range_max": 0.1252343749999909,
+  "d_deepen_max": 0.2504687499999818,
+  "traj_max_hpa": 0.20007812500000455,
+  "note": "d_deepen floor = 2 x worst single-arm range (difference of two noisy arms)"
+ }
+}

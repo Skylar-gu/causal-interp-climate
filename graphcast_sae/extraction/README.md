@@ -20,3 +20,6 @@ and are not used by any paper result; kept so the lane is reproducible.
 
 External assets: GraphCast params (`GRAPHCAST_PARAMS`), DeepMind `stats/`
 (`GRAPHCAST_ASSETS`), WeatherBench2 ERA5 streamed from the public GCS bucket.
+
+`stage_era5_local.py` copies the WeatherBench2 chunks a job needs to a local zarr for compute
+nodes without internet (`FS_ERA5_LOCAL`).

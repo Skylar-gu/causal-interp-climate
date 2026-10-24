@@ -1,0 +1,27 @@
+# JAX / GraphCast environment — Python 3.11
+# Exact versions the published results were produced with (origin box, 2026-08).
+# Install GPU JAX separately, it depends on your CUDA:  pip install "jax[cuda12]==0.10.2"
+
+# GraphCast itself is installed from the DeepMind repo at a pinned commit; the PyPI
+# release is NOT equivalent.
+graphcast @ git+https://github.com/deepmind/graphcast.git@08cf73625c9d12bd9aaa038868bcb2fe488f2a22
+
+jax==0.10.2
+jaxlib==0.10.2
+dm-haiku==0.0.16
+dm-tree==0.1.10
+chex==0.1.92
+jraph==0.0.6.dev0
+
+# ERA5 is streamed live from WeatherBench 2 public GCS — these do the streaming
+xarray==2026.7.0
+zarr==3.1.6
+gcsfs==2026.7.0
+fsspec==2026.6.0
+dask==2026.7.1
+
+numpy==2.4.6
+scipy==1.17.1
+pandas==3.0.3
+trimesh==4.12.2
+cartopy==0.25.0

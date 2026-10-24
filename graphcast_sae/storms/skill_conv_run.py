@@ -193,6 +193,38 @@ if FIELDS:
 if GAINS:
     print(f"GAIN SWEEP: g = {GAINS}  (g=0 == the committed conv-normal arm, "
           f"g=1 == baseline, g>1 amplifies)", flush=True)
+# REVISION READOUTS (added 2026-10-12, notes/prereg_cluster_revision.md). All opt-in; with
+# none set the arm set, graph and payload are exactly as before.
+#   MECH_CTL_ALL_GAINS=1  a rand-gain-<g> control arm at EVERY gain, not only max(GAINS)
+#                         (J1: the sweep never had a control that could fail at matching dose)
+#   MECH_PRE=1            also read features from the PRE-patch activation (J3: the post-patch
+#                         capture partly encodes the patch itself)
+#   MECH_REPLICATES=n     n copies of each arm in MECH_REPL_ARMS (default baseline,conv-normal),
+#                         named <arm>#r<k>, in the same invocation (J4: direct per-arm floor)
+#   MECH_FIELDS=1 now also stores, per arm per lead, in-disk quantiles of the steered
+#   convection codes (off-manifold flag) and out-of-disk z500/t850/MSLP RMSE vs ERA5 (collateral).
+CTL_ALL_GAINS = os.environ.get("MECH_CTL_ALL_GAINS", "") == "1"
+PRE = os.environ.get("MECH_PRE", "") == "1"
+REPL = int(os.environ.get("MECH_REPLICATES", "1"))
+REPL_ARMS = [x for x in os.environ.get("MECH_REPL_ARMS", "baseline,conv-normal").split(",") if x]
+#   MECH_DIRS=1           J2 direction baselines (prereg amendment 2): for every g in MECH_GAINS,
+#                         dir-rand{1..5}-g and dir-dom-g, same per-node magnitude as gain-g
+#                         (fs_common.SAEJax.delta_dir). Needs live analogs (not MECH_FTARGET).
+DIRS = os.environ.get("MECH_DIRS", "") == "1"
+N_RAND_DIRS = 5
+
+
+def provenance():
+    import jax, subprocess
+    try:
+        smi = subprocess.run(["nvidia-smi", "--query-gpu=name,driver_version", "--format=csv,noheader"],
+                             capture_output=True, text=True, timeout=20).stdout.strip()
+    except Exception as e:
+        smi = f"nvidia-smi failed: {e}"
+    return dict(gpu=smi, jax=jax.__version__, devices=[str(d) for d in jax.devices()],
+                cuda=os.environ.get("CUDA_VERSION", "pip nvidia-*-cu12 wheels"),
+                cluster=os.environ.get("CC_CLUSTER", os.uname().nodename),
+                slurm_job=os.environ.get("SLURM_JOB_ID"), era5_local=os.environ.get("FS_ERA5_LOCAL"))
 
 def numpyify(ds):
     return xr.Dataset({v: (ds[v].dims, np.asarray(ds[v].values)) for v in ds.data_vars},
@@ -266,8 +298,11 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
         inp, tg, fr = fc.build_batch_inputs([blk], 0, tc)
         z = jnp.zeros(sae.n_features, jnp.float32)
         _, acts = apply(inp, tg, fr, (z, z, np.zeros(len(mlat), np.float32)))
+        if PRE: acts = acts[0]   # zero patch: post == pre
         X = np.asarray(acts, np.float32).reshape(-1, fc.D_IN)
+        last_X[0] = X
         return np.asarray(sae.codes(jnp.asarray(X)))
+    last_X = [None]; dom_analog = []
 
     # ---- NORMAL reference from quiet, no-storm analogs (for CONV and RANDOM) ----
     # MECH_FTARGET=<json>: per-storm frozen normal levels {storm: {feat: level}}, taken
@@ -290,6 +325,8 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
         for f in CONV + RAND:
             v = c[nmask.astype(bool), f]; accf[f].extend(v[v > 0].tolist())
         used.append(a); print(f"  analog {a}: TC={storm:.0f} quiet, used", flush=True)
+        if DIRS:
+            dom_analog.append(last_X[0][nmask.astype(bool)].astype(np.float64))
     ftarget = np.zeros(sae.n_features, np.float32)
     if frozen:
         froz = {int(k): float(v) for k, v in json.load(open(frozen))[name].items()}
@@ -326,6 +363,29 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
             arms[f"gain-{g:g}"] = (fsel_conv, ftarget, nmask, np.float32(g))
         for kind in RAMPS:
             arms[f"ramp-{kind}"] = (fsel_conv, ftarget, nmask, _sched(kind, H))
+    dirinfo = None
+    if DIRS:
+        assert GAINS and not frozen and dom_analog, "MECH_DIRS needs MECH_GAINS and live analogs"
+        codes_at(cfg["ic"]); Xic = last_X[0][nmask.astype(bool)].astype(np.float64)
+        # same nodes, storm IC minus the mean over quiet analogue dates, averaged over the disk
+        dom = (Xic - np.mean(dom_analog, axis=0)).mean(0)
+        u_dom = (dom / np.linalg.norm(dom)).astype(np.float32)
+        Dc = np.asarray(sae.W_dec, np.float64)[:, CONV]
+        Q, _ = np.linalg.qr(Dc)
+        u_rand = []
+        for k in range(N_RAND_DIRS):
+            v = np.random.default_rng(k).standard_normal(fc.D_IN)
+            v = v - Q @ (Q.T @ v)                       # orthogonal to the convection decoder span
+            u_rand.append((v / np.linalg.norm(v)).astype(np.float32))
+        Dn = Dc / np.linalg.norm(Dc, axis=0)
+        dirinfo = dict(u_dom=u_dom, u_rand=np.stack(u_rand), n_analogs=len(dom_analog),
+                       cos_dom_conv=(Dn.T @ u_dom).tolist())
+        print(f"  J2 directions: DoM from {len(dom_analog)} analogs, cos(DoM, conv decoders) "
+              f"{np.round(dirinfo['cos_dom_conv'], 3).tolist()}", flush=True)
+        for g in GAINS:
+            for k in range(N_RAND_DIRS):
+                arms[f"dir-rand{k+1}-{g:g}"] = (fsel_conv, ftarget, nmask, np.float32(g), u_rand[k])
+            arms[f"dir-dom-{g:g}"] = (fsel_conv, ftarget, nmask, np.float32(g), u_dom)
     # An empty RAND means no control has been drawn for this battery yet (the
     # exposure probe). Skip the arm rather than run a no-op and report it as a
     # passing control -- a control that ablates nothing cannot fail.
@@ -334,6 +394,9 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
         if GAINS:   # matched-gain control: amplify the RANDOM group by the largest g
             arms[f"rand-gain-{max(GAINS):g}"] = (fsel_rand, ftarget, nmask,
                                                  np.float32(max(GAINS)))
+        if GAINS and CTL_ALL_GAINS:   # J1: the same control at every gain, same names pattern
+            for g in GAINS:
+                arms.setdefault(f"rand-gain-{g:g}", (fsel_rand, ftarget, nmask, np.float32(g)))
         # matched-SCHEDULE control (added 2026-08-20). The rand-gain arm above is gated on
         # GAINS, so before this a MECH_RAMPS run produced convection ramp/pulse arms and NO
         # control arm at all -- a schedule sweep with nothing to fail against certifies
@@ -356,6 +419,15 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
                                  f"available {sorted(arms)}")
         arms = {k: arms[k] for k in _keep}
         print(f"  MECH_ARMS restricts this run to {list(arms)}", flush=True)
+    if REPL > 1:
+        # conv-normal is the gain-0 arm under a sweep; replicate whichever name exists
+        for k in REPL_ARMS:
+            src = k if k in arms else ("gain-0" if k == "conv-normal" and "gain-0" in arms else None)
+            if src is None:
+                raise AssertionError(f"MECH_REPL_ARMS names {k}, not in {sorted(arms)}")
+            for r in range(1, REPL):
+                arms[f"{src}#r{r}"] = arms[src]
+    print(f"  ARMS ({len(arms)}): {list(arms)}", flush=True)
 
     inp, tgt, frc = build_io(cfg["ic"], H, tc)
     tct = tgt.time.isel(time=slice(0, 1))
@@ -368,10 +440,30 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
         C = np.asarray(sae.codes(X))
         return {f: float(C[inbox, f].sum()) for f in FEAT_TRACK}, C
 
+    disk = nmask.astype(bool)
+    if FIELDS:   # collateral readout: out-of-disk RMSE vs ERA5 on the lat-lon grid, per lead
+        glat_all = np.asarray(tgt.lat.values, np.float64); glon_all = np.asarray(tgt.lon.values, np.float64)
+        LA, LO = np.meshgrid(glat_all, glon_all, indexing="ij")
+        outd = gc_km(LA, LO, center[0], center[1]) >= S.RADIUS_KM
+        wcos = np.cos(np.deg2rad(LA)) * outd
+        def _tr(v, lev=None):
+            x = tgt[v].sel(level=lev) if lev is not None else tgt[v]
+            return np.asarray(x.transpose("batch", "time", "lat", "lon").values, np.float64)[0]
+        truth = dict(z500=_tr("geopotential", 500) / 9.80665, t850=_tr("temperature", 850),
+                     mslp=_tr("mean_sea_level_pressure") / 100.0)
+
+        def collateral(p, h):
+            pr = dict(z500=np.asarray(p["geopotential"].sel(level=500).values, np.float64).squeeze() / 9.80665,
+                      t850=np.asarray(p["temperature"].sel(level=850).values, np.float64).squeeze(),
+                      mslp=np.asarray(p["mean_sea_level_pressure"].values, np.float64).squeeze() / 100.0)
+            return {k: float(np.sqrt((wcos * (pr[k] - truth[k][h]) ** 2).sum() / wcos.sum())) for k in pr}
+
     def roll(patch, capture_mid=False):
         cur = inp; per = {f: [] for f in FEAT_TRACK}
         mslp = []; wind = []; snap = None
-        fld = {"mslp": [], "wind": [], "clat": [], "clon": [], "nodefeat": []}
+        fld = {"mslp": [], "wind": [], "clat": [], "clon": [], "nodefeat": [],
+               "diskq": [], "collat": []}
+        per_pre = {f: [] for f in FEAT_TRACK}
         glat = glon = None
         pj0 = tuple(jnp.asarray(x) for x in patch)
         # MECH_RAMPS hands the gain in as a LENGTH-H SCHEDULE, but the patch tuple was built
@@ -386,9 +478,20 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
             ct = tgt.isel(time=slice(h, h+1)).assign_coords(time=tct)
             cf = frc.isel(time=slice(h, h+1)).assign_coords(time=tct)
             p, a = apply(cur, ct, cf, pj)
+            if PRE:
+                a, a_pre = a
+                bfp, _ = boxfeats(a_pre)
+                for f in FEAT_TRACK: per_pre[f].append(bfp[f])
             bf, C = boxfeats(a)
             for f in FEAT_TRACK: per[f].append(bf[f])
             p = numpyify(p)
+            if FIELDS:
+                # off-manifold flag: the STEERED (post-patch) convection codes on disk nodes,
+                # to be compared with each feature's i.i.d. 99.9th percentile offline
+                dq = C[np.ix_(disk, CONV)]
+                fld["diskq"].append(np.stack([np.quantile(dq, 0.99, axis=0), np.quantile(dq, 0.999, axis=0),
+                                              dq.max(axis=0)]).astype(np.float32))
+                fld["collat"].append(collateral(p, h))
             mm, ww = box_phys(p, box); mslp.append(mm); wind.append(ww)
             if FIELDS:
                 d, glat, glon = box_fields(p, box)
@@ -415,13 +518,17 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
                 cur = rollout._get_next_inputs(cur, xr.merge([p, cf])).assign_coords(time=cur.coords["time"])
         out = dict(box_feats={f: np.array(per[f]) for f in FEAT_TRACK},
                    mslp_min=np.array(mslp), wind_max=np.array(wind))
+        if PRE:
+            out["box_feats_pre"] = {f: np.array(per_pre[f]) for f in FEAT_TRACK}
         if FIELDS:
             out["fields"] = dict(
                 mslp=np.stack(fld["mslp"]).astype(np.float32),
                 wind=np.stack(fld["wind"]).astype(np.float32),
                 clat=np.array(fld["clat"], np.float32), clon=np.array(fld["clon"], np.float32),
                 nodefeat=np.stack(fld["nodefeat"]).astype(np.float32),
-                grid_lat=glat, grid_lon=glon)
+                grid_lat=glat, grid_lon=glon,
+                disk_q=np.stack(fld["diskq"]),          # (H, 3 [q99,q99.9,max], len(CONV))
+                collat={k: np.array([c[k] for c in fld["collat"]]) for k in ("z500", "t850", "mslp")})
         return out, snap
 
     res = {}; snaps = {}
@@ -445,6 +552,10 @@ def run_storm(name, cfg, sae, apply, mlat, mlon, params_ok=True, suffix="", ic_o
     # only present when MECH_IC_OFFSETS is in use, so the default payload is unchanged
     if ic_offset is not None:
         out["ic_offset_h"] = int(ic_offset)
+    if CTL_ALL_GAINS or PRE or REPL > 1 or os.environ.get("FS_ERA5_LOCAL"):
+        out["provenance"] = provenance()
+    if dirinfo is not None:
+        out["j2_dirs"] = dirinfo
     np.save(OUT / f"run_{name}{suffix}.npy", out, allow_pickle=True)
     print(f"  -> run_{name}{suffix}.npy", flush=True)
     return out
@@ -456,7 +567,8 @@ def main():
     global tc
     sae = fc.SAEJax()
     params, mc, tc, stats = fc.load_model()
-    rf, _ = fc.build_apply_cond(mc, tc, stats, sae, bf16=True)
+    rf, _ = (fc.build_apply_cond(mc, tc, stats, sae, bf16=True, capture_pre=True) if PRE
+             else fc.build_apply_cond(mc, tc, stats, sae, bf16=True))
     apply = fc.make_apply(params, rf, patched=True)
     print(f"model+SAE loaded; features={sae.n_features}; storms={list(S.STORMS)}", flush=True)
     for name, cfg in S.STORMS.items():

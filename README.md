@@ -1,4 +1,11 @@
-# Causal discovery and interventions inside weather forecasting models 
+# Causal discovery and interventions inside weather forecasting models
+
+Code and results for **Auditing Learned Dynamics in Weather Models** (NeurIPS 2026 workshop,
+Interpretability for Discovery). Paper: [link to paper](TODO-paper-url)
+
+Reproduction details for every figure, table and number are in `docs/REPRODUCE.md`; the
+camera-ready revision runs (controlled gain sweep, direction baselines, run-to-run floor,
+ablation type, Southern Hemisphere storms) are in its "Camera-ready revision runs" section.
 
 ## Quick start — demo
 
@@ -32,9 +39,12 @@ graphcast_sae/       GraphCast SAE experiments
   appendix/          supporting analyses
 
 figures/             paper figures and builders
+scripts/             SLURM / shell launchers for the GPU runs
+env/                 pinned JAX and analysis environments
 results/             curated experiment outputs
 data/                mesh geometry and feature metadata
 docs/prereg/         preregistrations
+docs/notes/          result notes cited by the paper
 tests/               self-tests
 notebooks/           demo notebook
 
