@@ -61,7 +61,7 @@ committed before any run) and its amendments 1–3; results are summarised in
 | J7 | J1 on five Southern Hemisphere storms | `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/rev_verdict.json` |
 
 `storms.offmanifold_check` compares the steered codes with the i.i.d. catalog maximum
-(`results/offmanifold_check.json`). Clusters without internet: stage ERA5 with
+(`results/offmanifold_check.json`). On an Alliance cluster, `GC_SCRATCH=<scratch> bash scripts/setup_rorqual.sh` (login node) builds `.venv-jax`, downloads the GraphCast checkpoint and stats, and stages ERA5; then `sbatch` the job. Clusters without internet: stage ERA5 with
 `extraction.stage_era5_local` and set `FS_ERA5_LOCAL`.
 
 Other camera-ready inputs: five-angle grid-lock scores (`results/fs_rotation_all*.npy`,
