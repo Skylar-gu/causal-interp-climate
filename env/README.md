@@ -6,7 +6,7 @@
 
 | env | interpreter on the origin box | used by |
 |---|---|---|
-| **JAX / GraphCast** | `~/miniforge3/envs/graphcast/bin/python` (3.11.15) | `graphcast_sae/*`, `figures/main_claims/fig2_interventions.py`, anything running a GraphCast forward pass |
+| **JAX / GraphCast** | `~/miniforge3/envs/graphcast/bin/python` (3.11.15) | `graphcast_sae/*`, anything running a GraphCast forward pass |
 | **torch / analysis** | `.venv-analysis` (3.9, below) | CPU-only scripts in `graphcast_sae/` whose docstring says `python3` |
 
 Throughout the docs these are written `$PY_JAX` and `$PY_TORCH`.
