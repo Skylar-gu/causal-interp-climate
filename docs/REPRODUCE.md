@@ -57,7 +57,7 @@ committed before any run) and its amendments 1–3; results are summarised in
 | J2 | random and difference-of-means directions | `MECH_RES=dirs_j2 storms.rev_analyze j2` | `results/skill/dirs_j2/rev_verdict.json` |
 | J4 | run-to-run floor (5 replicates, default GPU ops) | `MECH_RES=determinism_j4 storms.rev_analyze j4` | `results/skill/determinism_j4/rev_verdict.json` |
 | J6 | feature 2954, zero vs mean ablation | `gridlock.global_rmse_ablate` | `results/fs_j6_ablation_type.npy` |
-| Fig. 2b, 2c | J1 for the single features 2401 and 3316: gains 0–3, each with its own control matched per storm on core activation (`storms.core_control_single` → `results/core_control_{2401,3316}.json`) at every gain, seven storms | `rev_fig2.sbatch` (14 tasks) | `results/skill/fig2_{2401,3316}/` |
+| Fig. 2b, 2c | J1 for the single features 2401 and 3316: gains 0–3, each with three controls matched per storm on core activation (`storms.core_control_single` → `results/core_control_{2401,3316}_c{0,1,2}.json`), each scaled on its own at every gain, control curve = their mean; seven storms | `rev_fig2.sbatch` (56 tasks: feature × storm × {feature, 3 controls}) | `results/skill/fig2_{2401,3316}/`, `fig2_{2401,3316}_c{0,1,2}/` |
 | J7 | J1 on five Southern Hemisphere storms | `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/rev_verdict.json` |
 
 `storms.offmanifold_check` compares the steered codes with the i.i.d. catalog maximum
