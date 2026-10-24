@@ -2,13 +2,12 @@
 
   a  restore-to-normal of the single features 2401 (convection) and 3316 (low-level vorticity),
      every storm, each against its random-feature control: results/skill/mech_{2401,3316}
-  b  convection-group gain sweep on Ida and Haishen from the controlled sweep (J1), with the
-     in-box control at every gain: results/skill/suff_ctl/rev_verdict.json (`err_mslp`)
-  c  feature 3316 gain sweep on Ida and Haishen, with its random-feature control arms at
-     alpha = 0 and 3: results/skill/gain_3316
+  b  feature 2401 gain sweep on Ida and Haishen: results/skill/fig2_2401
+     (scripts/run_fig2b_local.sh)
+  c  feature 3316 gain sweep on Ida and Haishen: results/skill/gain_3316
 
-MSLP error is rev_analyze.arm_metrics `err_mslp` (box minimum MSLP against ERA5 over leads up
-to max(ERA5 peak, +36 h); forecast step k aligned with analysis k+1), for both b and c.
+MSLP error in b and c is the min-MSLP trajectory RMSE against ERA5 of rev_analyze.arm_metrics
+`err_mslp` (leads up to max(ERA5 peak, +36 h); forecast step k aligned with analysis k+1).
 
 Derives figure2_final_web_notitle_print.html from figure2_web_notitle_print.html (same CSS and
 drawing helpers) by replacing the D.fig2 data block, the three Figure 2 panel scripts and the
@@ -38,24 +37,12 @@ def restore(name):
             [m[s]["arms"]["rand-normal"]["d_deepen"] for s in STORMS])
 
 
-def conv_sweep():
-    M = json.load(open(SK / "suff_ctl/rev_verdict.json"))["metrics"]
-    gains = [0, 0.5, 1.25, 1.5, 2, 2.5, 3]
+def sweep(name, gains):
+    """Aligned min-MSLP RMSE against ERA5 for each arm of results/skill/<name>/run_<storm>.npy."""
+    T = np.load(SK / f"{name}/era5_truth.npy", allow_pickle=True).item()
     out = {}
     for s in SWEPT:
-        a = M[s]["arms"]
-        out[s] = dict(gains=gains, err=[a["gain-%g" % g]["err_mslp"] for g in gains],
-                      ctl=[a["rand-gain-%g" % g]["err_mslp"] for g in gains],
-                      baseline=a["baseline"]["err_mslp"])
-    return out
-
-
-def spin_sweep():
-    T = np.load(SK / "gain_3316/era5_truth.npy", allow_pickle=True).item()
-    gains = [0, 1.25, 1.5, 1.75, 2, 2.5, 3]
-    out = {}
-    for s in SWEPT:
-        res = np.load(SK / f"gain_3316/run_{s}.npy", allow_pickle=True).item()["res"]
+        res = np.load(SK / f"{name}/run_{s}.npy", allow_pickle=True).item()["res"]
         t = np.asarray(T[s]["mslp_min"])
 
         def rmse(arm):
@@ -63,14 +50,14 @@ def spin_sweep():
             assert np.isfinite(mm).all(), (s, arm)
             w = np.arange(min(max(int(np.argmin(t)), 6), H))
             return float(np.sqrt(np.mean((mm[w] - t[1:H + 1][w]) ** 2)))
-        out[s] = dict(gains=gains, err=[rmse("gain-%g" % g) for g in gains], baseline=rmse("baseline"),
-                      ctl={"0": rmse("rand-normal"), "3": rmse("rand-gain-3")})
+        out[s] = dict(gains=gains, err=[rmse("gain-%g" % g) for g in gains], baseline=rmse("baseline"))
     return out
 
 
 conv, cctl = restore("mech_2401")
 spin, sctl = restore("mech_3316")
-D2 = dict(storms=STORMS, conv=conv, cctl=cctl, spin=spin, sctl=sctl, gconv=conv_sweep(), gspin=spin_sweep())
+D2 = dict(storms=STORMS, conv=conv, cctl=cctl, spin=spin, sctl=sctl, gconv=sweep("fig2_2401", [0, 0.5, 1.25, 1.5, 2, 2.5, 3]),
+          gspin=sweep("gain_3316", [0, 1.25, 1.5, 1.75, 2, 2.5, 3]))
 
 JS = r"""// ---------- Figure 2a  (submitted look: 3316 green above, 2401 blue below, grey open controls)
 const CONV = "#2f6f8f", CONV_L = "#8bbcd0", VORT = "#2f8f6b", VORT_L = "#8fceb9", X1 = "#c4c7ca";
