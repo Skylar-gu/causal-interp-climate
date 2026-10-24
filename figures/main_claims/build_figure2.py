@@ -130,11 +130,15 @@ doseResponse("f2c", "gspin", "vorticity scaling (α)", "MSLP error against vorti
 """
 
 LEGEND = """  <div class="f2legend">
-    <span><i class="dot" style="background:var(--blue)"></i>convection</span>
-    <span><i class="dot" style="background:var(--glass)"></i>low-level vorticity</span>
+    <span>a:</span>
+    <span><i class="dot" style="background:var(--blue)"></i>convection (2401)</span>
+    <span><i class="dot" style="background:var(--glass)"></i>low-level vorticity (3316)</span>
     <span><i class="dot ring"></i>random-feature control</span>
+    <span class="gap">b, c:</span>
+    <span><i class="dot" style="background:var(--blue)"></i>Ida</span>
+    <span><i class="sq"></i>Haishen</span>
     <span><i class="dash"></i>in-box control (b)</span>
-    <span class="sub">b, c: <i class="dot ring small"></i>0: storm excess removed &nbsp;|&nbsp; &times;1: unmodified forecast &nbsp;|&nbsp; <i class="dot big"></i>large marker: lowest error</span>
+    <span class="sub"><i class="dot ring small"></i>0: storm excess removed &nbsp;|&nbsp; &times;1: unmodified forecast &nbsp;|&nbsp; <i class="dot big"></i>large marker: lowest error</span>
   </div>
 """
 LEGEND_CSS = """
@@ -145,6 +149,7 @@ LEGEND_CSS = """
 .f2legend .ring{background:var(--panel);border:1.4px solid var(--grey)}
 .f2legend .small{width:8px;height:8px;border-color:var(--muted)} .f2legend .big{width:12px;height:12px;background:var(--muted)}
 .arrowfont{font-family:"IBM Plex Sans","Noto Sans Math",sans-serif}
+.f2legend .sq{display:inline-block;width:9px;height:9px;background:var(--glass)} .f2legend .gap{margin-left:18px}
 .f2legend .dash{display:inline-block;width:18px;border-top:1.6px dashed var(--grey)}
 """
 
