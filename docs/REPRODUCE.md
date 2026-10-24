@@ -57,6 +57,7 @@ committed before any run) and its amendments 1–3; results are summarised in
 | J2 | random and difference-of-means directions | `MECH_RES=dirs_j2 storms.rev_analyze j2` | `results/skill/dirs_j2/rev_verdict.json` |
 | J4 | run-to-run floor (5 replicates, default GPU ops) | `MECH_RES=determinism_j4 storms.rev_analyze j4` | `results/skill/determinism_j4/rev_verdict.json` |
 | J6 | feature 2954, zero vs mean ablation | `gridlock.global_rmse_ablate` | `results/fs_j6_ablation_type.npy` |
+| 2401 | J1 for the single feature 2401: gains 0–3, in-box control at α = 0, 2, 3, seven storms | `rev_2401.sbatch` (or `run_2401_sweep.sh` on one local GPU) | `results/skill/suff_2401/` (Fig. 2b) |
 | J7 | J1 on five Southern Hemisphere storms | `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/rev_verdict.json` |
 
 `storms.offmanifold_check` compares the steered codes with the i.i.d. catalog maximum
