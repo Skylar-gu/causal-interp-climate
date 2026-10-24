@@ -72,73 +72,67 @@ conv, cctl = restore("mech_2401")
 spin, sctl = restore("mech_3316")
 D2 = dict(storms=STORMS, conv=conv, cctl=cctl, spin=spin, sctl=sctl, gconv=conv_sweep(), gspin=spin_sweep())
 
-JS = r"""// ---------- Figure 2a
+JS = r"""// ---------- Figure 2a  (submitted look: 3316 green above, 2401 blue below, grey open controls)
+const CONV = "#2f6f8f", CONV_L = "#8bbcd0", VORT = "#2f8f6b", VORT_L = "#8fceb9", X1 = "#c4c7ca";
 {
   const nice = {ida2021:"Ida", michael2018:"Michael", haishen2020:"Haishen", goni2020:"Goni", haiyan2013:"Haiyan", patricia2015:"Patricia", wilma2005:"Wilma"};
   const F = D.fig2, n = F.storms.length;
   const idx = F.spin.map((v,i)=>i).sort((i,j)=>F.spin[i]-F.spin[j]);
   const m = {l:64*FS, r:16, t:8, b:38*FS};
   const xs = lin(-.85, 8.15, m.l, W-m.r);
-  const ys = k => H-m.b - (k+0.5)*(H-m.t-m.b)/n, dy = 3.1*FS;
+  const ys = k => H-m.b - (k+0.5)*(H-m.t-m.b)/n, dy = 3.4*FS;
   let s = frame(m, xs, [0,2,4,6,8], null, null, true, false, "deepening removed (hPa)");
   s += `<line x1="${xs(0)}" x2="${xs(0)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)" stroke-width="1"/>`;
   idx.forEach((i,k)=>{
     const y = ys(k);
-    [[F.conv[i], F.cctl[i], C.blue, -dy], [F.spin[i], F.sctl[i], C.glass, dy]].forEach(([v,c,col,o])=>{
+    [[F.spin[i], F.sctl[i], VORT, -dy], [F.conv[i], F.cctl[i], CONV, dy]].forEach(([v,c,col,o])=>{
       s += `<line x1="${xs(c)}" x2="${xs(v)}" y1="${y+o}" y2="${y+o}" stroke="var(--pale)" stroke-width="1.1"/>`;
-      s += `<circle cx="${xs(c)}" cy="${y+o}" r="3.0" fill="var(--panel)" stroke="${C.grey}" stroke-width="1.1"/>`;
+      s += `<circle cx="${xs(c)}" cy="${y+o}" r="2.9" fill="var(--panel)" stroke="${C.grey}" stroke-width="1.1"/>`;
       s += `<circle cx="${xs(v)}" cy="${y+o}" r="3.3" fill="${col}"/>`;
     });
     s += `<text class="ylab" x="${m.l-8}" y="${y+4*FS}" text-anchor="end">${nice[F.storms[i]]}</text>`;
   });
   document.getElementById("f2a").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Deepening removed per storm, features 2401 and 3316 vs random controls">${s}</svg>`;
 }
-// ---------- Figure 2b, 2c (same axes)
-function doseResponse(id, key, xlabel, aria, side){
+// ---------- Figure 2b, 2c (submitted look)
+function doseResponse(id, key, xlabel, aria, dark, light, annot){
   const m = {l:52*FS, r:16, t:8, b:38*FS};
   const xs = lin(-.12, 3.12, m.l, W-m.r), ys = lin(0, 21, H-m.b, m.t);
   let s = frame(m, xs, [0,1,2,3], ys, [0,5,10,15,20], false, true, xlabel, "MSLP error (hPa)", v => v===0 ? "0" : "×"+v);
   for (const t of [0,5,10,15,20]) s += `<text class="tick" x="${m.l-6}" y="${ys(t)+4*FS}" text-anchor="end">${t}</text>`;
-  s += `<line x1="${xs(1)}" x2="${xs(1)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)" stroke-width="1"/>`;
+  s += `<line x1="${xs(1)}" x2="${xs(1)}" y1="${m.t}" y2="${H-m.b}" stroke="${X1}" stroke-width="1.4"/>`;
   const mark = (x,y,r,col,sq,fill) => sq ? `<rect x="${x-r}" y="${y-r}" width="${2*r}" height="${2*r}" fill="${fill}" stroke="${col}" stroke-width="1.2"/>`
                                           : `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${col}" stroke-width="1.2"/>`;
-  const series = [["ida2021","Ida",C.blue,false],["haishen2020","Haishen",C.glass,true]];
+  const series = [["haishen2020","Haishen",light,true],["ida2021","Ida",dark,false]];
   series.forEach(([st,lab,col,sq])=>{
     const g = D.fig2[key][st];
-    const pts = [[1, g.baseline], ...g.gains.map((v,i)=>[v, g.err[i]]).filter(p=>p[0]>0)].sort((p,q)=>p[0]-q[0]);
-    const x = pts.map(p=>p[0]), y = pts.map(p=>p[1]);
-    if (Array.isArray(g.ctl)) {             // in-box control at every gain
-      const cp = [[1, g.baseline], ...g.gains.map((v,i)=>[v, g.ctl[i]]).filter(p=>p[0]>0)].sort((p,q)=>p[0]-q[0]);
-      const yc = cp.map(p=>p[1]);
-      s += `<polyline fill="none" stroke="${C.grey}" stroke-width="1" stroke-dasharray="3 2" points="${x.map((v,i)=>xs(v)+","+ys(yc[i])).join(" ")}"/>`;
-    } else {                                // random-feature control at the end gains
-      for (const [gk, v] of Object.entries(g.ctl)) s += mark(xs(+gk), ys(v), 3.0, C.grey, sq, "var(--panel)");
-    }
-    s += `<polyline fill="none" stroke="${col}" stroke-width="1.6" points="${x.map((v,i)=>xs(v)+","+ys(y[i])).join(" ")}"/>`;
-    x.forEach((v,i)=> s += mark(xs(v), ys(y[i]), 2.8, col, sq, col));
+    const pts = [[1, g.baseline], ...g.gains.map((v,i)=>[v, g.err[i]])].sort((p,q)=>p[0]-q[0]);
+    const lo = pts.filter(p=>p[0]<=1), hi = pts.filter(p=>p[0]>=1);
+    // alpha < 1 (storm excess removed or reduced): dotted; alpha >= 1 (unmodified and amplified): solid
+    s += `<polyline fill="none" stroke="${col}" stroke-width="1.3" stroke-dasharray="2 2.6" points="${lo.map(p=>xs(p[0])+","+ys(p[1])).join(" ")}"/>`;
+    s += `<polyline fill="none" stroke="${col}" stroke-width="1.6" points="${hi.map(p=>xs(p[0])+","+ys(p[1])).join(" ")}"/>`;
+    pts.forEach(([x,y])=> { if (x > 0) s += mark(xs(x), ys(y), 2.7, col, sq, col); });
     s += mark(xs(0), ys(g.err[0]), 3.2, col, sq, "var(--panel)");
-    let j = 0; y.forEach((v,i)=>{ if (v < y[j]) j = i; });
-    s += mark(xs(x[j]), ys(y[j]), 4.4, col, sq, col);
-    const ly = st==="ida2021" ? m.t+12*FS : m.t+27*FS;
-    const lx = side==="left" ? m.l+8 : W-m.r, anchor = side==="left" ? "start" : "end";
-    s += `<text class="note arrowfont" x="${lx}" y="${ly}" fill="${col}" text-anchor="${anchor}">${lab} ${f(g.baseline)} &#8594; ${f(y[j])}</text>`;
+    let j = 0; hi.forEach((p,i)=>{ if (p[1] < hi[j][1]) j = i; });
+    if (st === "ida2021") {
+      s += `<circle cx="${xs(hi[j][0])}" cy="${ys(hi[j][1])}" r="6.2" fill="none" stroke="${col}" stroke-width="1.4"/>`;
+      s += `<text class="note arrowfont" x="${annot==="right" ? W-m.r : m.l+8}" y="${annot==="right" ? m.t+12*FS : m.t+42*FS}" text-anchor="${annot==="right" ? "end" : "start"}" fill="${col}">Ida ${f(g.baseline)} &#8594; ${f(hi[j][1])} hPa</text>`;
+    }
   });
+  const lx = m.l+8, ly = m.t+8*FS;
+  s += `<line x1="${lx}" x2="${lx+16}" y1="${ly}" y2="${ly}" stroke="${dark}" stroke-width="1.6"/>` + mark(lx+8, ly, 2.6, dark, false, dark) + `<text class="note" x="${lx+22}" y="${ly+4*FS}">Ida</text>`;
+  s += `<line x1="${lx}" x2="${lx+16}" y1="${ly+15*FS}" y2="${ly+15*FS}" stroke="${light}" stroke-width="1.6"/>` + mark(lx+8, ly+15*FS, 2.6, light, true, light) + `<text class="note" x="${lx+22}" y="${ly+19*FS}">Haishen</text>`;
   document.getElementById(id).innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${aria}">${s}</svg>`;
 }
-doseResponse("f2b", "gconv", "convection scaling (α)", "MSLP error against convection scaling for Ida and Haishen", "left");
-doseResponse("f2c", "gspin", "vorticity scaling (α)", "MSLP error against vorticity scaling for Ida and Haishen", "right");
+doseResponse("f2b", "gconv", "convection scaling (α)", "MSLP error against convection scaling for Ida and Haishen", CONV, CONV_L, "left");
+doseResponse("f2c", "gspin", "vorticity scaling (α)", "MSLP error against vorticity scaling for Ida and Haishen", VORT, VORT_L, "right");
 """
 
 LEGEND = """  <div class="f2legend">
-    <span>a:</span>
-    <span><i class="dot" style="background:var(--blue)"></i>convection (2401)</span>
-    <span><i class="dot" style="background:var(--glass)"></i>low-level vorticity (3316)</span>
-    <span><i class="dot ring"></i>random-feature control</span>
-    <span class="gap">b, c:</span>
-    <span><i class="dot" style="background:var(--blue)"></i>Ida</span>
-    <span><i class="sq"></i>Haishen</span>
-    <span><i class="dash"></i>in-box control (b)</span>
-    <span class="sub"><i class="dot ring small"></i>0: storm excess removed &nbsp;|&nbsp; &times;1: unmodified forecast &nbsp;|&nbsp; <i class="dot big"></i>large marker: lowest error</span>
+    <span><i class="dot" style="background:#2f6f8f"></i>feature 2401 (convection)</span>
+    <span><i class="dot" style="background:#2f8f6b"></i>feature 3316 (vorticity)</span>
+    <span><i class="dot ring"></i>matched random control</span>
+    <span class="sub">panels b, c: &nbsp;&nbsp;<i class="dot ring small"></i>0: storm excess removed &nbsp;&nbsp;&nbsp;<i class="x1bar"></i>&times;1: unmodified forecast &nbsp;&nbsp;&nbsp;<i class="dot target"></i>circled: minimum MSLP</span>
   </div>
 """
 LEGEND_CSS = """
@@ -150,6 +144,7 @@ LEGEND_CSS = """
 .f2legend .small{width:8px;height:8px;border-color:var(--muted)} .f2legend .big{width:12px;height:12px;background:var(--muted)}
 .arrowfont{font-family:"IBM Plex Sans","Noto Sans Math",sans-serif}
 .f2legend .sq{display:inline-block;width:9px;height:9px;background:var(--glass)} .f2legend .gap{margin-left:18px}
+.f2legend .x1bar{display:inline-block;width:2px;height:14px;background:#c4c7ca} .f2legend .target{width:9px;height:9px;background:#555;box-shadow:0 0 0 2px #fff,0 0 0 3.4px #555}
 .f2legend .dash{display:inline-block;width:18px;border-top:1.6px dashed var(--grey)}
 """
 

@@ -1,0 +1,122 @@
+{
+ "ida2021": {
+  "rand": [
+   3807
+  ],
+  "conv_inbox": [
+   0.14091254770755768
+  ],
+  "new_inbox": [
+   0.12681089341640472
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 839
+ },
+ "michael2018": {
+  "rand": [
+   3669
+  ],
+  "conv_inbox": [
+   0.0
+  ],
+  "new_inbox": [
+   0.0
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 166
+ },
+ "haishen2020": {
+  "rand": [
+   3402
+  ],
+  "conv_inbox": [
+   6.100495338439941
+  ],
+  "new_inbox": [
+   5.957213878631592
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 372
+ },
+ "goni2020": {
+  "rand": [
+   1517
+  ],
+  "conv_inbox": [
+   2.4360461235046387
+  ],
+  "new_inbox": [
+   1.9734059572219849
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 285
+ },
+ "haiyan2013": {
+  "rand": [
+   3606
+  ],
+  "conv_inbox": [
+   0.4435026943683624
+  ],
+  "new_inbox": [
+   0.4303877651691437
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 279
+ },
+ "patricia2015": {
+  "rand": [
+   3400
+  ],
+  "conv_inbox": [
+   0.5029324889183044
+  ],
+  "new_inbox": [
+   0.44526705145835876
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 244
+ },
+ "wilma2005": {
+  "rand": [
+   463
+  ],
+  "conv_inbox": [
+   0.0
+  ],
+  "new_inbox": [
+   0.0
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 175
+ },
+ "nondev2013": {
+  "rand": [
+   1387
+  ],
+  "conv_inbox": [
+   0.21210432052612305
+  ],
+  "new_inbox": [
+   0.17114347219467163
+  ],
+  "old_inbox": [
+   0.0
+  ],
+  "box_nodes": 329
+ }
+}
