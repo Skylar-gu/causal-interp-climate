@@ -9,7 +9,7 @@ non-developer. This is the ERA5-truth reference the skill comparison scores agai
 No GPU: run with plain `python` in the JAX env (JAX stays on CPU).
 Writes results/skill/$MECH_RES/era5_truth.npy (crash-safe per storm; default convection).
 
-Paper: Sec. 3 'The intervention contrast' (Table tab:mechanism-interventions)
+Paper: Sec. 3.2 (ERA5 truth for the storm runs)
 Inputs: WeatherBench2 ERA5 (GCS, streamed)
 Outputs: results/skill/<MECH_RES|convection>/era5_truth.npy (crash-safe per storm)
 Run:   # JAX env, CPU

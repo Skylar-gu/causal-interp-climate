@@ -1,6 +1,6 @@
 """Score results/fs_ida_genesis_v2.npy against the bars in docs/prereg/prereg_ida_genesis_calibrated.md.
 
-Paper: Sec. 3.3; docs/notes/result_ida_genesis_calibrated_2026_08_29.md
+Paper: Fig. 3 (selects the convection and vorticity groups)
 Inputs: results/fs_ida_genesis_v2.npy, results/fs_mechanisms_v2.npy (both shipped)
 Outputs: results/fs_ida_genesis_v2_verdict.json (shipped)
 Run:   # CPU, seconds

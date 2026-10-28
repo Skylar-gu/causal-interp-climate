@@ -6,7 +6,7 @@ Fork of ida_mechmaps.py with two changes for the paper figure rebuild:
     baseline and for each boosted run, so the figure can show the storm's
     spin-up as a time-lapse rather than a before/after pair.
 
-Paper: Fig. 5, Ida dial-up (figures/paper_fig_ida_dialup.py)
+Paper: Fig. 3, Ida cyclone-feature progression (figures/fig3_ida_dialup.py)
 Inputs: GraphCast params (GRAPHCAST_PARAMS)
 Outputs: results/fs_ida_mechmaps_prog<MECHMAPS_TAG>.npy (shipped: _v2 = calibrated groups, "" = the 39c8e9b groups)
 Run:   # JAX env, GPU (~46 GB)

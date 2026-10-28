@@ -19,7 +19,7 @@ footprint test is meaningful for mesh_locked and close to vacuous for scatter_bl
 union covers five sixths of the planet and nearly coincides with its control's. Individual
 features are local (0.2-1.2%), so the scatter class has to be tested ONE FEATURE AT A TIME.
 
-Paper: Sec. 3, grid-locked-feature ablations (demo notebook part 4)
+Paper: App. C, Fig. 5 (per-gridpoint z500 error under grid-locked ablation)
 Inputs: i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_footprint_masks.npz
 Run:   # demo env (numpy/scipy/matplotlib)

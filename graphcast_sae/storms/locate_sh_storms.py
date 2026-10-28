@@ -6,7 +6,7 @@ displacement, no angle, no ablation effect. It reads MSLP only, to (a) fix the s
 and tracking box from data rather than from recall, and (b) reject any candidate ERA5 does
 not show as a closed deepening minimum inside the window. That is a data gate on the input.
 
-Paper: not in the paper (Southern-Hemisphere battery)
+Paper: Table 2 (locates the Southern-Hemisphere storms)
 Inputs: WeatherBench2 ERA5 (GCS, streamed)
 Outputs: results/sh_storm_gate.npy
 Run:   # JAX env, CPU

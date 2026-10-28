@@ -7,7 +7,7 @@ grid is 0..360 so all selection code must normalize (past bug).
 
 Rollout: from each IC to +96h (16 steps). Feature 3243 = TC; convection = [2401,2067,3174].
 
-Paper: Table tab:mechanism-interventions (the frozen seven-storm registry)
+Paper: Sec. 3.2 (the seven-storm registry)
 Inputs: WeatherBench2 ERA5 (GCS, streamed)
 Outputs: printed report
 Run:   # demo env (numpy/scipy/matplotlib)

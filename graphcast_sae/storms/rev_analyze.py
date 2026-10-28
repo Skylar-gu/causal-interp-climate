@@ -9,7 +9,7 @@ forecast MSLP; err = RMSE of box min-MSLP vs ERA5 over leads up to max(ERA5 peak
 re-implemented here only because that function hard-codes its four arm names.
 Writes results/skill/<MECH_RES>/rev_verdict.json. Never differences arms across runs.
 
-Paper: Table tab:ledger, Fig. 2, Sec. 3.3 (J1 gain sweep, J3 readout, J4 floor, J7 Southern Hemisphere)
+Paper: Fig. 2, Tables 1-2 (J1-J8 scoring: MSLP error, gates, J7 Southern Hemisphere)
 Inputs: results/skill/<MECH_RES>/run_*.npy (not shipped, written by storms/skill_conv_run.py)
 Outputs: results/skill/<MECH_RES>/rev_verdict.json
 Run:   # JAX env, CPU

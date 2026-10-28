@@ -6,7 +6,7 @@ scored inside each mask, inside each mask's COMPLEMENT, and globally in one pass
 signature of a genuine artifact is help-INSIDE plus hurt-OUTSIDE, or help inside with nothing
 outside; a load-bearing feature hurts in both.
 
-Paper: Sec. 3, grid-locked-feature ablations (demo notebook part 4)
+Paper: App. C, Fig. 5 (per-gridpoint z500 error under grid-locked ablation)
 Inputs: results/fs_footprint_masks.npz (not shipped, see docs/REPRODUCE.md); results/fs_footprint_rmse.npy (shipped)
 Outputs: printed report
 Run:   # JAX env, CPU

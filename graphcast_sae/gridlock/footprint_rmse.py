@@ -29,7 +29,7 @@ arms are carried here and were not in the global run.
 
     FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false \
 
-Paper: Sec. 3, grid-locked-feature ablations (demo notebook part 4)
+Paper: App. C, Fig. 5 (per-gridpoint z500 error under grid-locked ablation)
 Inputs: results/fs_footprint_masks.npz (not shipped, see docs/REPRODUCE.md); GraphCast params (GRAPHCAST_PARAMS)
 Outputs: out/global_rmse_status.txt; results/fs_footprint_rmse.npy
 Run:   # JAX env, GPU (~46 GB)

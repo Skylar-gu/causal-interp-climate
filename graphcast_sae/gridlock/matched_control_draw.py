@@ -19,7 +19,7 @@ control from being "same area, completely different shape".
 Controls are drawn from features NOT in the candidate set, matched within tolerance on
 coverage and on frac_largest, then ranked by closeness in n_comp and degree.
 
-Paper: Sec. 3 coverage/connectivity-matched controls (results/matched_controls.json)
+Paper: App. C (coverage/connectivity-matched controls; results/matched_controls.json)
 Inputs: i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_connectivity.npy; results/matched_controls.json
 Run:   # JAX env, CPU

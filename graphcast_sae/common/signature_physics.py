@@ -24,7 +24,26 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 
-from graphcast_sae.common.gint_consensus import deseason
+# ── deseasonalization + detrend ──────────────────────────────────────────────
+def harmonic_design(times):
+    """times: datetime64[ns] -> design matrix [1, t_lin, annual(K=3), diurnal(K=1)]."""
+    t = times.astype("datetime64[s]").astype(np.float64)      # seconds
+    t_lin = (t - t.mean()) / (t.std() + 1e-9)
+    # annual phase
+    yr = 365.2422 * 86400.0
+    day = 86400.0
+    cols = [np.ones_like(t), t_lin]
+    for k in range(1, 4):                                     # annual + 2 harmonics
+        cols += [np.sin(2 * np.pi * k * t / yr), np.cos(2 * np.pi * k * t / yr)]
+    for k in range(1, 2):                                     # diurnal
+        cols += [np.sin(2 * np.pi * k * t / day), np.cos(2 * np.pi * k * t / day)]
+    return np.stack(cols, 1)
+
+def deseason(series, times):
+    """series (T,N) -> residual (T,N) after OLS removal of harmonic+trend design."""
+    D = harmonic_design(times)
+    beta, *_ = np.linalg.lstsq(D, series, rcond=None)
+    return series - D @ beta
 
 V_MAX = 50.0        # SG-1 plausibility gate (m/s)
 R_MIN = 0.80        # SG-2 footprint-coherence threshold (mean resultant length)

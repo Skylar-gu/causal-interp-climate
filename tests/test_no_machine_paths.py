@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN = ["/home/" + "ec2-" + "user", "/tmp/" + "cla" + "ude", "Path.home()", 'expanduser("~', ".venv", "miniforge"]
 SUFFIXES = {".py", ".md", ".txt", ".ipynb", ".json", ".sh", ".cfg", ".ini", ".toml"}
 TREES = ["graphcast_sae", "figures", "tests"]
-FILES = ["notebooks/demo.ipynb", "README.md", "requirements.txt", "requirements-dev.txt", ".gitignore"]
+FILES = ["notebooks/demo.ipynb", "README.md", "requirements.txt", ".gitignore"]
 # The ignore pattern for virtualenv directories is the one legitimate mention.
 ALLOW = {(".gitignore", ".venv")}
 

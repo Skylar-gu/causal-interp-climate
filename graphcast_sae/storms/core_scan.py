@@ -21,7 +21,7 @@ this SAE and must be reported as such rather than as a passing control.
 
     FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false \
 
-Paper: Table tab:mechanism-interventions (input to the core-matched control)
+Paper: App. B (core firing scan, input to the matched controls)
 Inputs: GraphCast params (GRAPHCAST_PARAMS)
 Outputs: results/fs_core_scan.npy
 Run:   # JAX env, GPU (~46 GB)

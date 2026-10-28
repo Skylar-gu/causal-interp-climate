@@ -18,7 +18,7 @@ co-location overlay.
 
 Serialize behind other GPU jobs. Crash-safe per storm: results/skill/convection/run_<name>.npy.
 
-Paper: Sec. 3 'The intervention contrast' (Table tab:mechanism-interventions)
+Paper: Sec. 3.2 (every storm intervention run: restore-to-normal and gain sweeps)
 Inputs: GraphCast params (GRAPHCAST_PARAMS); WeatherBench2 ERA5 (GCS, streamed)
 Outputs: results/skill/<MECH_RES|convection>/run_<storm>.npy (crash-safe per storm; gain/ramp arms add a suffix)
 Run:   # JAX env, GPU (~46 GB)

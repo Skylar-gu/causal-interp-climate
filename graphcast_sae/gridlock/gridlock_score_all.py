@@ -8,7 +8,7 @@ features as a class.
 Score = mean Jaccard overlap of a feature's active node set between pairs of dates, over
 NW dates spanning a year. Computed in feature chunks so the masks fit in memory.
 
-Paper: Sec. 3 grid-lock score (results/fs_gridlock_all.npy)
+Paper: Sec. 3.1 / App. C (grid-lock score; results/fs_gridlock_all.npy)
 Inputs: i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_gridlock_all.npy
 Run:   # JAX env, CPU
