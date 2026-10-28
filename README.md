@@ -1,7 +1,7 @@
 # Causal discovery and interventions inside weather forecasting models
 
 Code for **Auditing Learned Dynamics in Weather Models** (NeurIPS 2026 workshop, Interpretability
-for Discovery). `docs/REPRODUCE.md` maps every figure and table to its script and result file.
+for Discovery). `docs/REPRODUCE.md` generates reported figures and tables.
 
 ## Quick start — demo
 
