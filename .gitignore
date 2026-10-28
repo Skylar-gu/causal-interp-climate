@@ -21,3 +21,7 @@ out/
 fs_iid_dump.npy
 fs_iid_meta.json
 *.log
+
+# GraphCast checkpoint and stats, downloaded by scripts/setup_rorqual.sh (public, not shipped)
+assets/
+graphcast_sae/weights/graphcast_flagship_0p25_37lev.npz

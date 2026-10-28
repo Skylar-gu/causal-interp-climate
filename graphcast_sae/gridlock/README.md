@@ -19,5 +19,8 @@ Run order:
    scored inside each footprint (GPU)
 6. `rotation_all.py` (rotate the planet 180°: positional vs content features, 2 forwards),
    `rot_multidraw.py`, `f2075_climatology.py` — the positional tests
+   `rotation_angles_summary.py` scores all five angles (45/90/135/180/270°; `scripts/rot_angles.sh`);
+   `results/matched_controls_six.json` holds the controls for the six features that pass at every angle
+   (`scripts/ablate_six.sh` runs their ablations; J6 adds mean ablation: `GR_ARMS` entries named `mean_*`, `scripts/rev_j6.sbatch`)
 
 Environment: JAX env; steps 4–5 and `rotation_all.py` need the GPU.

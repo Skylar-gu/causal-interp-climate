@@ -172,6 +172,16 @@ class SAEJax:
         d = (scaled - f) @ self.W_dec.T
         return nmask[:, None] * d
 
+    def delta_dir(self, x, fsel, ftarget, nmask, gain, u):
+        """DIRECTION BASELINE for delta_gain (added 2026-10-12, revision J2).
+
+        Same per-node magnitude as delta_gain, different direction: the node's delta_gain vector
+        has norm ||d||; this applies ||d|| * u along a fixed unit vector u (512,). Mask, gain and
+        schedule are identical by construction, so the arm differs from the treatment ONLY in
+        where in activation space the push goes."""
+        d = self.delta_gain(x, fsel, ftarget, nmask, gain)
+        return jnp.linalg.norm(d, axis=-1, keepdims=True) * u[None, :]
+
     def delta_cond_freeze(self, x, fsel, ftarget, nmask, jidx, fref, jmask):
         """MEDIATION patch (added 2026-08-20): ablate i AND clamp j to its BASELINE value.
 
@@ -309,13 +319,19 @@ def build_apply(model_config, task_config, stats, sae=None, bf16=False):
             return preds, captured["acts"][HOOK_STEP]
     return run_forward, captured
 
-def build_apply_cond(model_config, task_config, stats, sae, bf16=False):
+
+def build_apply_cond(model_config, task_config, stats, sae, bf16=False, capture_pre=False):
     """Like build_apply, but the patch CONDITIONS features to a normal level within a node mask
     (counterfactual 'restore to normal, localized', via sae.delta_cond).
     patch = (fsel (F,), ftarget (F,), nmask (n_mesh,)) -> delta_cond, or
     (fsel, ftarget, nmask, gain) -> delta_gain, or
     (fsel, ftarget, nmask, jidx (J,), fref (n_mesh,J), jmask (n_mesh,J)) -> delta_cond_freeze,
-    the mediation clamp. Runs on the full node set (no chunk)."""
+    the mediation clamp. Runs on the full node set (no chunk).
+
+    capture_pre=True (added 2026-10-12, revision J3) also returns the activation BEFORE
+    `X = X + _d`, as (post, pre). The post-patch capture encodes the patched state, so a
+    feature read from it at the same step partly reads the patch itself (cos(enc_3243,
+    dec_2401) = 0.179). Default False keeps the return value exactly as before."""
     def wrapped():
         predictor = gc.GraphCast(model_config, task_config)
         if bf16:
@@ -334,6 +350,8 @@ def build_apply_cond(model_config, task_config, stats, sae, bf16=False):
             if captured["count"] == HOOK_STEP:
                 ns = out.nodes["mesh_nodes"]; feats = ns.features; shp = feats.shape
                 X = feats.reshape(-1, shp[-1]).astype(jnp.float32)
+                if capture_pre:
+                    captured["acts_pre"] = X.reshape(shp)
                 p = captured["patch"]
                 fsel, ftarget, nmask = p[0], p[1], p[2]
                 # a 4-tuple carries a gain and selects delta_gain; 3-tuples keep the
@@ -344,6 +362,8 @@ def build_apply_cond(model_config, task_config, stats, sae, bf16=False):
                     _d = sae.delta_cond(X, fsel, ftarget, nmask)
                 elif len(p) == 4:
                     _d = sae.delta_gain(X, fsel, ftarget, nmask, p[3])
+                elif len(p) == 5:   # (…, gain, u): J2 direction baseline, added 2026-10-12
+                    _d = sae.delta_dir(X, fsel, ftarget, nmask, p[3], p[4])
                 else:
                     _d = sae.delta_cond_freeze(X, fsel, ftarget, nmask, p[3], p[4], p[5])
                 X = X + _d
@@ -357,6 +377,8 @@ def build_apply_cond(model_config, task_config, stats, sae, bf16=False):
         captured["count"] = 0; captured["patch"] = patch
         with hk.intercept_methods(interceptor):
             preds = wrapped()(inputs, targets_template=targets_template, forcings=forcings)
+        if capture_pre:
+            return preds, (captured["acts"][HOOK_STEP], captured["acts_pre"])
         return preds, captured["acts"][HOOK_STEP]
     return run_forward, captured
 
@@ -383,9 +405,15 @@ def recon_patch(sae):
 @functools.lru_cache(maxsize=1)
 def open_wb2():
     """The authors' own training source: WB2 0.25°/37-lev derived zarr (anon GCS)."""
-    import gcsfs
-    fs = gcsfs.GCSFileSystem(token="anon")
-    ds = xr.open_zarr(fs.get_mapper(ZARR[5:]), consolidated=True)
+    # FS_ERA5_LOCAL (added 2026-10-12, cluster port): a sparse local copy of the same zarr
+    # made by stage_era5_local.py, byte-identical chunks, for compute nodes with no internet.
+    local = os.environ.get("FS_ERA5_LOCAL")
+    if local:
+        ds = xr.open_zarr(local, consolidated=True)
+    else:
+        import gcsfs
+        fs = gcsfs.GCSFileSystem(token="anon")
+        ds = xr.open_zarr(fs.get_mapper(ZARR[5:]), consolidated=True)
     ren = {}
     if "latitude" in ds.coords:
         ren["latitude"] = "lat"
@@ -423,6 +451,9 @@ def load_block(center, nframes=INPUT_WINDOW):
     ds, statics = open_wb2()
     times = np.datetime64(center) - STEP + np.arange(nframes) * STEP
     blk = ds[list(SURFACE_VARS) + list(ATMOS_VARS) + list(FORCING_VARS)].sel(time=times).load()
+    if os.environ.get("FS_ERA5_LOCAL"):   # an unstaged chunk reads back as all-NaN fill
+        bad = [v for v in blk.data_vars if not np.isfinite(blk[v].values).all()]
+        assert not bad, f"FS_ERA5_LOCAL: non-finite (unstaged?) frames {times} in {bad}"
     return blk, times, statics
 
 def build_batch_inputs(blocks, s, task_config):

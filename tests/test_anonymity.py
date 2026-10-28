@@ -14,7 +14,7 @@ PATTERNS = [
     re.compile(r"\bclaude\b", re.I),
     re.compile(r"anthropic", re.I),
     re.compile(r"claude\.ai/code"),
-    re.compile(r"github\.com/(?!google-deepmind|xtibau|paperswithcode|ANONYMIZED)[A-Za-z0-9_-]+"),
+    re.compile(r"github\.com/(?!google-deepmind|deepmind/graphcast|conda-forge/|xtibau|paperswithcode|ANONYMIZED)[A-Za-z0-9_-]+"),
 ]
 SKIP_PREFIXES = ("docs/", "savar/")
 BINARY = {".npy", ".npz", ".pdf", ".png", ".pt"}

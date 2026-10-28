@@ -38,10 +38,55 @@ same shipped files.
 
 | result | from shipped files | re-run (inputs → outputs) |
 |---|---|---|
-| Fig. 1 — grid-locked features are causally relevant: footprints of a grid-locked, a land-locked and a convection feature, with global $z_{500}$ ablation scores | `figures/main_claims/figure3_gridlocked_notitle.pdf` (paper Fig. 1); `make_figures.py` panel from `results/fs_footprints*.npy` | grid-lock lane below |
-| Fig. 2 — interventions: (a) per-storm deepening removed by restoring the convection features, (b) convection dose–response | `figures/main_claims/figure2_interventions_notitle.pdf` (paper Fig. 2: `convection` (a), `gain_conv` (b)); the single-spin-feature layout is `figure2p5_interventions_notitle.pdf` via `build_figure2p5.py` (`results/skill/mech_3316`, `gain_3316`, `mech_spin3316`, `convection`, `moisture2`); notebook parts 2-3 | per arm: `storms.skill_conv_verify_era5` (CPU, WB2) → `MECH_RES=<arm> MECH_FEATS=<ids>` GPU `storms.skill_conv_run` (8 storms × 4 arms × 96 h, ~1 GPU-h) → `storms.skill_conv_analyze` → `verdict.json`. Shipped arms: `convection` 2401,2067,3174 · `mech_2401` 2401 · `mech_spin3316` 2089,2514,3316 · `mech_3316` 3316 · `mech_asc21` 553,866,1981 · `mech_shear` 2070,575,456,1514 · `mech_vort850` 2822,2935,1148,2089 (the polar, exposure-limited group an earlier draft called "low-level spin") · `moisture2` 2958,2671,37; random control 3667,2875,2850. Gain sweeps: `MECH_RES=gain_conv` / `gain_3316` with `MECH_GAINS=0,1.25,1.5,1.75,2,2.5,3` on `haishen2020 ida2021 patricia2015` (~25 GPU-min each); `gain_3316_ext` extends Ida to α=5 (`MECH_GAINS=3.5,4,4.5,5`, prereg amendment 1) |
-| Fig. 3 — Ida dial-up progression: the internal cyclone feature f3243 at +12/+24/+36/+48 h, baseline vs each mechanism group doubled, with an ERA5-forced reference row | `figures/paper_fig_ida_dialup.py` → `paper_fig_ida_dialup.pdf` (reads `results/fs_ida_mechmaps_prog_v2.npy`; `MECHMAPS_TAG=` for the original groups); notebook part 1. The paper renders the reduced convection+vorticity+ERA5-forced layout | GPU `MECHMAPS_TAG=_v2 MECHMAPS_GROUPS='{...}' storms.ida_mechmaps_prog` (5 × 48 h, ~4 GPU-min); groups from `storms.steer_ida_genesis_v2` (prereg `docs/prereg/prereg_ida_genesis_calibrated.md`), scored by `storms.ida_genesis_v2_analyze` → `results/fs_ida_genesis_v2_verdict.json`; single-feature decomposition `storms.steer_ida_genesis_v2_followup` |
+| Fig. 1 — grid-locked features are causally relevant: footprints of a grid-locked, a land-locked and a convection feature, with global $z_{500}$ ablation scores | `figures/main_claims/figure3_gridlocked_notitle.pdf` (paper Fig. 1); `figures/main_claims/make_figures.py` panel from `results/fs_footprints*.npy` | grid-lock lane below |
+| Fig. 2 — interventions: (a) single features 2401 (convection) and 3316 (low-level vorticity) restored to normal, every storm, random-feature controls; (b) feature 2401 gain sweep on Ida and Haishen; (c) feature 3316 gain sweep on Ida and Haishen. (b, c) plot MSLP error (min-MSLP RMSE against ERA5) | `figures/main_claims/figure2_interventions_final.pdf`, built by `python figures/main_claims/build_figure2.py` (writes `figure2_final_web_notitle_print.html` from `figure2_web_notitle_print.html` and prints it with headless chromium via playwright): (a) `results/skill/mech_2401`, `mech_3316`; (b) `results/skill/fig2_2401`; (c) `results/skill/gain_3316` (prereg `docs/prereg/prereg_gain_3316.md`). Tab. 1, Tab. 3 and the seven-storm amplification numbers: `python -m graphcast_sae.storms.single_feature_tables` (J8, below); the group-level MSLP summary is `python -m graphcast_sae.storms.rmse_summary` → `results/rmse_summary.json` | (a) skill_conv lane; (b) `rev_fig2.sbatch`; (c) `MECH_RES=gain_3316 MECH_FEATS=3316` |
+| Fig. 2 (submitted draft) | `figures/main_claims/figure2_interventions_notitle.pdf` (paper Fig. 2: `convection` (a), `gain_conv` (b)); the single-spin-feature layout is `figure2p5_interventions_notitle.pdf` via `figures/main_claims/build_figure2p5.py` (`results/skill/mech_3316`, `gain_3316`, `mech_spin3316`, `convection`, `moisture2`); notebook parts 2-3 | per arm: `storms.skill_conv_verify_era5` (CPU, WB2) → `MECH_RES=<arm> MECH_FEATS=<ids>` GPU `storms.skill_conv_run` (8 storms × 4 arms × 96 h, ~1 GPU-h) → `storms.skill_conv_analyze` → `verdict.json`. Shipped arms: `convection` 2401,2067,3174 · `mech_2401` 2401 · `mech_spin3316` 2089,2514,3316 · `mech_3316` 3316 · `mech_asc21` 553,866,1981 · `mech_shear` 2070,575,456,1514 · `mech_vort850` 2822,2935,1148,2089 (the polar, exposure-limited group an earlier draft called "low-level spin") · `moisture2` 2958,2671,37; random control 3667,2875,2850. Gain sweeps: `MECH_RES=gain_conv` / `gain_3316` with `MECH_GAINS=0,1.25,1.5,1.75,2,2.5,3` on `haishen2020 ida2021 patricia2015` (~25 GPU-min each); `gain_3316_ext` extends Ida to α=5 (`MECH_GAINS=3.5,4,4.5,5`, prereg amendment 1) |
+| Fig. 3 — Ida dial-up progression: the internal cyclone feature f3243 at +12/+24/+36/+48 h, baseline vs each mechanism group doubled, with an ERA5-forced reference row | `figures/paper_fig_ida_dialup.py` → `paper_fig_ida_dialup.pdf` (reads `results/fs_ida_mechmaps_prog_v2.npy`; `MECHMAPS_TAG=` for the original groups); notebook part 1. The paper renders the reduced convection+vorticity+ERA5-forced layout; the ERA5-forced row (`tc_truth`, +48 h value 213) is written into that file by `graphcast_sae/storms/ida_mechmaps_truth.py` (GPU, teacher-forced, ~5 GPU-min) and is not in the shipped copy, so without it the script omits that row | GPU `MECHMAPS_TAG=_v2 MECHMAPS_GROUPS='{...}' storms.ida_mechmaps_prog` (5 × 48 h, ~4 GPU-min); groups from `storms.steer_ida_genesis_v2` (prereg `docs/prereg/prereg_ida_genesis_calibrated.md`), scored by `storms.ida_genesis_v2_analyze` → `results/fs_ida_genesis_v2_verdict.json`; single-feature decomposition `storms.steer_ida_genesis_v2_followup` |
 | Tab. 1 — single-feature domination of each intervention group (median deepening removed, feature alone vs full group) | `results/skill/{convection,mech_2401,mech_spin3316,mech_3316}/verdict.json`; notebook part 2 | skill_conv lane above; `mech_2401` (prereg `docs/prereg/prereg_mech_2401.md`) is the single convection feature, `mech_3316` the single spin feature |
+
+## Camera-ready revision runs (J1–J7)
+
+GPU jobs run after review under `docs/prereg/prereg_cluster_revision.md` (pass/fail bars
+committed before any run) and its amendments 1–6; J1–J7 results are summarised in
+`docs/notes/result_cluster_revision_2026_10_12.md`, J8 in `docs/notes/result_j8_2026_10_20.md`. Launchers: `scripts/rev_env.sh` +
+`scripts/rev_j*.sbatch` (submit from the repository root). All but J4 use deterministic GPU ops.
+
+| job | what | scorer | result |
+|---|---|---|---|
+| J1 (+J3) | convection gain sweep α ∈ {0, 0.5, 1, 1.25, 1.5, 2, 2.5, 3}, in-box control at every gain; TC feature read before the patch | `MECH_RES=suff_ctl storms.rev_analyze j1` | `results/skill/suff_ctl/rev_verdict.json` |
+| J2 | random and difference-of-means directions | `MECH_RES=dirs_j2 storms.rev_analyze j2` | `results/skill/dirs_j2/rev_verdict.json` |
+| J4 | run-to-run floor (5 replicates, default GPU ops) | `MECH_RES=determinism_j4 storms.rev_analyze j4` | `results/skill/determinism_j4/rev_verdict.json` |
+| J6 | feature 2954, zero vs mean ablation | `gridlock.global_rmse_ablate` | `results/fs_j6_ablation_type.npy` |
+| Fig. 2b, 2c | J1 for the single features 2401 and 3316: gains 0–3, each with three controls matched per storm on core activation (`storms.core_control_single` → `results/core_control_{2401,3316}_c{0,1,2}.json`), each scaled on its own at every gain, control curve = their mean; seven storms | `rev_fig2.sbatch` (56 tasks: feature × storm × {feature, 3 controls}) | `results/skill/fig2_{2401,3316}/`, `fig2_{2401,3316}_c{0,1,2}/` |
+| J8 | single-feature gain sweeps, 2401 and 3316 separately, gains 0–3, control at every gain, seven storms (amendments 4–6) | `rev_analyze.arm_metrics` on the cluster (causal-graphcast layout); gates in the result notes | `results/skill/j8_summary.json` (deepening error, gates), `results/skill/single_feature_mslp.json` (MSLP error, Tab. 1, 3) |
+| J7 | J1 on five Southern Hemisphere storms | `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/rev_verdict.json` |
+
+**Single-feature amplification numbers (Tab. 1, Tab. 3, abstract, Sec. 3).** `python -m
+graphcast_sae.storms.single_feature_tables` → `results/skill/single_feature_tables.json` gives the
+best-α improvement per storm (2401: median 51 %, 2–75 %; 3316: median 42 %, 15–71 %), the α = 3
+column and the leave-one-out scaling factors and errors (2401: 7.4 hPa, α 1.5–2.5; 3316: 2.5 hPa,
+α = 3). Its input `results/skill/single_feature_mslp.json` was transcribed from the J8 cluster runs;
+the per-run rollouts (`run_*.npy`) are not shipped (see its `provenance` field). Ida and Haishen
+agree with the shipped `results/skill/fig2_2401/` and `results/skill/gain_3316/` within 0.3 hPa.
+The bias correction in Tab. 3 (median 2.3 hPa) is `python -m graphcast_sae.storms.offset_baseline`
+→ `results/skill/offset_baseline.json`, from the shipped `results/skill/convection/` runs.
+
+J8's preregistered bar was on deepening error, not MSLP error, and is reported in the notes as
+written: f2401 fails (4/7); f3316 passes 6/7 descriptively but 3/7 under amendment 5, so that
+claim is not made. Amendment 6 (re-run on the original instrument) has no result note.
+
+`storms.offmanifold_check` compares the steered codes with the i.i.d. catalog maximum
+(`results/offmanifold_check.json`). On an Alliance cluster, `GC_SCRATCH=<scratch> bash scripts/setup_rorqual.sh` (login node) builds `.venv-jax`, downloads the GraphCast checkpoint and stats, and stages ERA5; then `sbatch` the job. Clusters without internet: stage ERA5 with
+`extraction.stage_era5_local` and set `FS_ERA5_LOCAL`.
+
+Other camera-ready inputs: five-angle grid-lock scores (`results/fs_rotation_all*.npy`,
+`gridlock.rotation_angles_summary`, `scripts/rot_angles.sh`); the six grid-locked features
+against matched controls (`results/fs_matched_rmse_six.npy`, `matched_controls_six.json`,
+`scripts/ablate_six.sh`); the 16 concept-group batteries (`results/skill/mech_*`, `moisture`);
+core firing and core-matched controls (`results/fs_core_scan.npy`, `core_control*.json`,
+`results/skill/conv_corectl{2,4}`); in-box controls (`results/inbox_control_*.json`); the
+disk-radius sweep (`results/skill/conv_radius_sweep.json`); HRES / best track
+(`results/hres_compare.npy`).
 
 App. Fig. 4 (grid-locked effects, six features × seven fields) and App. Fig. 5 (the same
 features as a per-gridpoint $z_{500}$ error map) are in the appendix table below.
