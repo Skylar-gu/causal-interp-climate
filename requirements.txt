@@ -16,6 +16,7 @@ nbclient==0.10.2
 nbformat==5.10.4
 ipykernel==6.31.0
 jupyter
+pytest>=7
 
 # --- figure builders (figures/) and causal-graph analyses --------------------
 cartopy>=0.22            # map panels (paper_fig_contrast / paper_fig_graphmap / paper_fig_maps)
