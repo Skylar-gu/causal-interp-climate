@@ -59,7 +59,7 @@ spin, sctl = restore("mech_3316")
 D2 = dict(storms=STORMS, conv=conv, cctl=cctl, spin=spin, sctl=sctl, gconv=sweep("fig2_2401", [0, 0.5, 1.25, 1.5, 2, 2.5, 3]),
           gspin=sweep("gain_3316", [0, 1.25, 1.5, 1.75, 2, 2.5, 3]))
 
-JS = r"""// ---------- Figure 2a  (submitted look: 3316 green above, 2401 blue below, grey open controls)
+JS = r"""// ---------- Figure 2a  (2401 blue above, 3316 green below, grey open controls)
 const CONV = "#2f6f8f", CONV_L = "#8bbcd0", VORT = "#2f8f6b", VORT_L = "#8fceb9", X1 = "#c4c7ca";
 {
   const nice = {ida2021:"Ida", michael2018:"Michael", haishen2020:"Haishen", goni2020:"Goni", haiyan2013:"Haiyan", patricia2015:"Patricia", wilma2005:"Wilma"};
@@ -72,7 +72,7 @@ const CONV = "#2f6f8f", CONV_L = "#8bbcd0", VORT = "#2f8f6b", VORT_L = "#8fceb9"
   s += `<line x1="${xs(0)}" x2="${xs(0)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)" stroke-width="1"/>`;
   idx.forEach((i,k)=>{
     const y = ys(k);
-    [[F.spin[i], F.sctl[i], VORT, -dy], [F.conv[i], F.cctl[i], CONV, dy]].forEach(([v,c,col,o])=>{
+    [[F.conv[i], F.cctl[i], CONV, -dy], [F.spin[i], F.sctl[i], VORT, dy]].forEach(([v,c,col,o])=>{
       s += `<line x1="${xs(c)}" x2="${xs(v)}" y1="${y+o}" y2="${y+o}" stroke="var(--pale)" stroke-width="1.1"/>`;
       s += `<circle cx="${xs(c)}" cy="${y+o}" r="2.9" fill="var(--panel)" stroke="${C.grey}" stroke-width="1.1"/>`;
       s += `<circle cx="${xs(v)}" cy="${y+o}" r="3.3" fill="${col}"/>`;
@@ -90,7 +90,7 @@ function doseResponse(id, key, xlabel, aria, dark, light, annot){
   s += `<line x1="${xs(1)}" x2="${xs(1)}" y1="${m.t}" y2="${H-m.b}" stroke="${X1}" stroke-width="1.4"/>`;
   const mark = (x,y,r,col,sq,fill) => sq ? `<rect x="${x-r}" y="${y-r}" width="${2*r}" height="${2*r}" fill="${fill}" stroke="${col}" stroke-width="1.2"/>`
                                           : `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${col}" stroke-width="1.2"/>`;
-  const series = [["haishen2020","Haishen",light,true],["ida2021","Ida",dark,false]];
+  const series = [["haishen2020","Haishen",light,true],["ida2021","Ida",dark,false]], best = {};
   series.forEach(([st,lab,col,sq])=>{
     const g = D.fig2[key][st];
     const pts = [[1, g.baseline], ...g.gains.map((v,i)=>[v, g.err[i]])].sort((p,q)=>p[0]-q[0]);
@@ -101,24 +101,22 @@ function doseResponse(id, key, xlabel, aria, dark, light, annot){
     pts.forEach(([x,y])=> { if (x > 0) s += mark(xs(x), ys(y), 2.7, col, sq, col); });
     s += mark(xs(0), ys(g.err[0]), 3.2, col, sq, "var(--panel)");
     let j = 0; hi.forEach((p,i)=>{ if (p[1] < hi[j][1]) j = i; });
-    if (st === "ida2021") {
-      s += `<circle cx="${xs(hi[j][0])}" cy="${ys(hi[j][1])}" r="6.2" fill="none" stroke="${col}" stroke-width="1.4"/>`;
-      s += `<text class="note arrowfont" x="${annot==="right" ? W-m.r : m.l+8}" y="${annot==="right" ? m.t+12*FS : m.t+42*FS}" text-anchor="${annot==="right" ? "end" : "start"}" fill="${col}">Ida ${f(g.baseline)} &#8594; ${f(hi[j][1])} hPa</text>`;
-    }
+    s += `<circle cx="${xs(hi[j][0])}" cy="${ys(hi[j][1])}" r="6.2" fill="none" stroke="${col}" stroke-width="1.4"/>`;
+    best[st] = `${lab} ${f(g.baseline)} &#8594; ${f(hi[j][1])}`;   // unmodified -> minimum, for the legend
   });
   const lx = m.l+8, ly = m.t+8*FS;
-  s += `<line x1="${lx}" x2="${lx+16}" y1="${ly}" y2="${ly}" stroke="${dark}" stroke-width="1.6"/>` + mark(lx+8, ly, 2.6, dark, false, dark) + `<text class="note" x="${lx+22}" y="${ly+4*FS}">Ida</text>`;
-  s += `<line x1="${lx}" x2="${lx+16}" y1="${ly+15*FS}" y2="${ly+15*FS}" stroke="${light}" stroke-width="1.6"/>` + mark(lx+8, ly+15*FS, 2.6, light, true, light) + `<text class="note" x="${lx+22}" y="${ly+19*FS}">Haishen</text>`;
+  s += `<line x1="${lx}" x2="${lx+16}" y1="${ly}" y2="${ly}" stroke="${dark}" stroke-width="1.6"/>` + mark(lx+8, ly, 2.6, dark, false, dark) + `<text class="note arrowfont" x="${lx+22}" y="${ly+4*FS}">${best.ida2021}</text>`;
+  s += `<line x1="${lx}" x2="${lx+16}" y1="${ly+15*FS}" y2="${ly+15*FS}" stroke="${light}" stroke-width="1.6"/>` + mark(lx+8, ly+15*FS, 2.6, light, true, light) + `<text class="note arrowfont" x="${lx+22}" y="${ly+19*FS}">${best.haishen2020}</text>`;
   document.getElementById(id).innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${aria}">${s}</svg>`;
 }
-doseResponse("f2b", "gconv", "convection scaling (α)", "MSLP error against convection scaling for Ida and Haishen", CONV, CONV_L, "left");
+doseResponse("f2b", "gconv", "convection scaling (α)", "MSLP error against convection scaling for Ida and Haishen", CONV, CONV_L, "right");
 doseResponse("f2c", "gspin", "vorticity scaling (α)", "MSLP error against vorticity scaling for Ida and Haishen", VORT, VORT_L, "right");
 """
 
 LEGEND = """  <div class="f2legend">
     <span><i class="dot" style="background:#2f6f8f"></i>feature 2401 (convection)</span>
     <span><i class="dot" style="background:#2f8f6b"></i>feature 3316 (vorticity)</span>
-    <span><i class="dot ring"></i>matched random control</span>
+    <span><i class="dot ring"></i>firing-rate-matched control</span>
     <span class="sub">panels b, c: &nbsp;&nbsp;<i class="dot ring small"></i>0: storm excess removed &nbsp;&nbsp;&nbsp;<i class="x1bar"></i>&times;1: unmodified forecast &nbsp;&nbsp;&nbsp;<i class="dot target"></i>circled: minimum MSLP</span>
   </div>
 """
