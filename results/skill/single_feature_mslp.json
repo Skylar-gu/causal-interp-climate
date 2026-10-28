@@ -1,0 +1,7 @@
+{
+ "provenance": "J8 single-feature gain sweeps (causal-graphcast prereg amendments 4-5), run on the cluster; run_*.npy not in this repo. MSLP error as rev_analyze.arm_metrics err_mslp (forecast step k vs analysis k+1, leads up to max(ERA5 peak, 6 steps)). Values supplied by the author 2026-10-26; Ida/Haishen agree with fig2_2401 and gain_3316 to within 0.3 hPa (GPU nondeterminism).",
+ "gains": [1, 1.25, 1.5, 2, 2.5, 3],
+ "storms": ["ida2021", "michael2018", "haishen2020", "goni2020", "haiyan2013", "patricia2015", "wilma2005"],
+ "f2401": [[8.87, 6.40, 4.87, 4.71, 1.81, 6.56, 11.37], [8.21, 6.05, 3.08, 4.45, 1.23, 6.54, 11.14], [7.43, 5.72, 2.37, 4.30, 1.67, 6.53, 10.71], [5.25, 4.67, 7.02, 3.73, 4.51, 6.50, 10.24], [2.59, 3.36, 12.88, 2.90, 7.54, 6.44, 9.69], [4.06, 1.62, 16.10, 1.98, 9.58, 6.51, 8.94]],
+ "f3316": [[8.89, 6.51, 4.59, 4.63, 1.79, 6.53, 11.19], [7.79, 5.90, 4.70, 4.35, 1.64, 6.22, 10.24], [6.68, 5.25, 4.51, 3.98, 1.55, 5.84, 9.33], [4.78, 4.25, 4.34, 3.40, 1.44, 5.12, 8.10], [3.52, 3.23, 3.95, 2.83, 1.39, 4.43, 7.08], [2.54, 2.50, 3.90, 2.40, 1.47, 3.81, 6.74]]
+}
