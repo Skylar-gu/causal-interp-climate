@@ -1,137 +1,21 @@
-# Reproducing the paper's results
+# Reproducing the paper
 
-Every figure and table in the paper regenerates on CPU in minutes from the shipped
-`results/`, `data/` and `results/*_inputs.npy` bundles, via `figures/paper_fig_*.py` and
-`notebooks/demo.ipynb`. Re-running the experiments themselves needs the DeepMind GraphCast
-checkpoint, WeatherBench2 ERA5 (streamed from `gs://weatherbench2/...`), one ~46 GB GPU,
-and for most CPU analyses the 6.7 GB i.i.d. activation dump. A few curated inputs come
-from an analysis pipeline that is not included; they are listed at the end.
+Figures and tables regenerate on CPU from the shipped `results/`, except where a row names a file
+as not shipped. The GPU column says how each result was produced (one ~46 GB GPU; see the README
+for the external assets). Commands run from the repository root.
 
-## Environment
-
-* Demo, figures and CPU analyses: Python 3.9, `pip install -r requirements.txt`
-  (`requirements-dev.txt` adds `pytest` and the notebook runner).
-* GPU experiments ("JAX env"): Python 3.11 with `jax[cuda12]`, `dm-haiku`,
-  `graphcast @ git+https://github.com/google-deepmind/graphcast.git`, `xarray`, `zarr`,
-  `gcsfs`; versions used are in the GPU block of `requirements.txt`. Three CPU catalog
-  scripts (`atlas/feature_select`, `obsgraph/build_pool`, `extraction/fs_catalog`) need `torch`.
-* Locations are resolved in `graphcast_sae/paths.py`: `GRAPHCAST_PARAMS` (checkpoint),
-  `GRAPHCAST_ASSETS` (its `stats/`), `GC_SCRATCH` (regenerable dumps; default `scratch/`).
-* Run scripts from the repository root as `python -m graphcast_sae.<group>.<script>`; every
-  script's docstring ends with `Paper / Inputs / Outputs / Run`. `python -m pytest tests -q`
-  checks imports and path hygiene.
-* The i.i.d. dump: `FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false python -m graphcast_sae.extraction.extract_iid_dump --n 160`
-  → `$GC_SCRATCH/fs_iid_dump.npy` (160 windows × 40,962 nodes × 512, fp16) + `fs_iid_meta.json`.
-
-`GPU` below means `FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false python -m …` in the JAX env.
-
-## Main-text results
-
-The current draft has two result sections — grid-locked features (Fig. 1) and tropical-cyclone
-interventions (Figs. 2–3) — plus two appendix figures and one appendix table. The
-`figures/main_claims/*_notitle.pdf` files keep their historical numbers in the **filename**
-(`figure3_…` is paper Fig. 1, `figure2_…` is paper Fig. 2); each is an HTML page with its data
-inlined (`figure<N>_web_notitle_print.html`), printed by headless chromium and cropped
-(`CHROME_BIN=<chrome> python figures/main_claims/build_figure2p5.py` shows the pipeline).
-`figures/main_claims/make_figures.py` is the matplotlib fallback for the same panels from the
-same shipped files.
-
-| result | from shipped files | re-run (inputs → outputs) |
+| paper | regenerate (CPU) | produced by (GPU) |
 |---|---|---|
-| Fig. 1 — grid-locked features are causally relevant: footprints of a grid-locked, a land-locked and a convection feature, with global $z_{500}$ ablation scores | `figures/main_claims/figure3_gridlocked_notitle.pdf` (paper Fig. 1); `figures/main_claims/make_figures.py` panel from `results/fs_footprints*.npy` | grid-lock lane below |
-| Fig. 2 — interventions: (a) single features 2401 (convection) and 3316 (low-level vorticity) restored to normal, every storm, random-feature controls; (b) feature 2401 gain sweep on Ida and Haishen; (c) feature 3316 gain sweep on Ida and Haishen. (b, c) plot MSLP error (min-MSLP RMSE against ERA5) | `figures/main_claims/figure2_interventions_final.pdf`, built by `python figures/main_claims/build_figure2.py` (writes `figure2_final_web_notitle_print.html` from `figure2_web_notitle_print.html` and prints it with headless chromium via playwright): (a) `results/skill/mech_2401`, `mech_3316`; (b) `results/skill/fig2_2401`; (c) `results/skill/gain_3316` (prereg `docs/prereg/prereg_gain_3316.md`). Tab. 1, Tab. 3 and the seven-storm amplification numbers: `python -m graphcast_sae.storms.single_feature_tables` (J8, below); the group-level MSLP summary is `python -m graphcast_sae.storms.rmse_summary` → `results/rmse_summary.json` | (a) skill_conv lane; (b) `rev_fig2.sbatch`; (c) `MECH_RES=gain_3316 MECH_FEATS=3316` |
-| Fig. 2 (submitted draft) | `figures/main_claims/figure2_interventions_notitle.pdf` (paper Fig. 2: `convection` (a), `gain_conv` (b)); the single-spin-feature layout is `figure2p5_interventions_notitle.pdf` via `figures/main_claims/build_figure2p5.py` (`results/skill/mech_3316`, `gain_3316`, `mech_spin3316`, `convection`, `moisture2`); notebook parts 2-3 | per arm: `storms.skill_conv_verify_era5` (CPU, WB2) → `MECH_RES=<arm> MECH_FEATS=<ids>` GPU `storms.skill_conv_run` (8 storms × 4 arms × 96 h, ~1 GPU-h) → `storms.skill_conv_analyze` → `verdict.json`. Shipped arms: `convection` 2401,2067,3174 · `mech_2401` 2401 · `mech_spin3316` 2089,2514,3316 · `mech_3316` 3316 · `mech_asc21` 553,866,1981 · `mech_shear` 2070,575,456,1514 · `mech_vort850` 2822,2935,1148,2089 (the polar, exposure-limited group an earlier draft called "low-level spin") · `moisture2` 2958,2671,37; random control 3667,2875,2850. Gain sweeps: `MECH_RES=gain_conv` / `gain_3316` with `MECH_GAINS=0,1.25,1.5,1.75,2,2.5,3` on `haishen2020 ida2021 patricia2015` (~25 GPU-min each); `gain_3316_ext` extends Ida to α=5 (`MECH_GAINS=3.5,4,4.5,5`, prereg amendment 1) |
-| Fig. 3 — Ida dial-up progression: the internal cyclone feature f3243 at +12/+24/+36/+48 h, baseline vs each mechanism group doubled, with an ERA5-forced reference row | `figures/paper_fig_ida_dialup.py` → `paper_fig_ida_dialup.pdf` (reads `results/fs_ida_mechmaps_prog_v2.npy`; `MECHMAPS_TAG=` for the original groups); notebook part 1. The paper renders the reduced convection+vorticity+ERA5-forced layout; the ERA5-forced row (`tc_truth`, +48 h value 213) is written into that file by `graphcast_sae/storms/ida_mechmaps_truth.py` (GPU, teacher-forced, ~5 GPU-min) and is not in the shipped copy, so without it the script omits that row | GPU `MECHMAPS_TAG=_v2 MECHMAPS_GROUPS='{...}' storms.ida_mechmaps_prog` (5 × 48 h, ~4 GPU-min); groups from `storms.steer_ida_genesis_v2` (prereg `docs/prereg/prereg_ida_genesis_calibrated.md`), scored by `storms.ida_genesis_v2_analyze` → `results/fs_ida_genesis_v2_verdict.json`; single-feature decomposition `storms.steer_ida_genesis_v2_followup` |
-| Tab. 1 — single-feature domination of each intervention group (median deepening removed, feature alone vs full group) | `results/skill/{convection,mech_2401,mech_spin3316,mech_3316}/verdict.json`; notebook part 2 | skill_conv lane above; `mech_2401` (prereg `docs/prereg/prereg_mech_2401.md`) is the single convection feature, `mech_3316` the single spin feature |
+| Fig. 1 — grid-locked, land-locked and vorticity footprints with $z_{500}$ ablation scores | `figures/fig1_gridlocked.html` is self-contained (data inlined); `figures/fig1_gridlocked.pdf` is its print | `graphcast_sae.gridlock.global_rmse_ablate` via `scripts/ablate_six.sh` → `results/fs_matched_rmse_six.npy` |
+| Fig. 2 — (a) restore-to-normal of 2401 and 3316; (b, c) gain sweeps on Ida and Haishen | `python figures/fig2_interventions.py` (playwright for the PDF) reads `results/skill/mech_2401`, `mech_3316`, `fig2_2401`, `gain_3316` | `graphcast_sae.storms.skill_conv_run` (`MECH_RES=<arm> MECH_FEATS=<ids>`), scored by `graphcast_sae.storms.skill_conv_analyze`; sweeps via `scripts/rev_fig2.sbatch`, controls from `graphcast_sae.storms.core_control_single` |
+| Fig. 3 — Ida cyclone feature under doubled convection / vorticity groups, ERA5-forced row | `python figures/fig3_ida_dialup.py` reads `results/fs_ida_mechmaps_prog_v2.npy` | `graphcast_sae.storms.ida_mechmaps_prog` (`MECHMAPS_TAG=_v2`); the ERA5-forced row (`tc_truth`, the 213) comes from `graphcast_sae.storms.ida_mechmaps_truth` and is not shipped; groups from `graphcast_sae.storms.steer_ida_genesis_v2` and `ida_genesis_v2_analyze` |
+| Fig. 4, Fig. 5 — grid-locked effects across fields and as a $z_{500}$ map | `python figures/fig4_gridlocked_effects.py`, `python figures/fig5_gridlocked_z500map.py` (cartopy); they also read `results/hybrid_footprint_fires.npz` and `results/gridlock_z500_perfeat_field.npy` (not shipped), so the shipped PDFs are the paper's renders | `graphcast_sae.gridlock.gridlock_score_all` → `matched_control_draw` → `global_rmse_ablate`; rotations `graphcast_sae.gridlock.rotation_all` (`scripts/rot_angles.sh`), criterion `rotation_angles_summary` |
+| Table 1, Table 3, abstract and Sec. 3.2 percentages | `python -m graphcast_sae.storms.single_feature_tables`; bias correction `python -m graphcast_sae.storms.offset_baseline` | J8 sweeps (prereg amendments 4–6), scored by `graphcast_sae.storms.rev_analyze`; `results/skill/single_feature_mslp.json` was transcribed from the cluster runs (rollouts not shipped) |
+| Table 2 — Southern Hemisphere | `MECH_RES=sh_suff_ctl python -m graphcast_sae.storms.rev_analyze j1` | `scripts/rev_j7.sbatch` |
+| Restore-to-normal medians (2.5 / 3.0 hPa) | `results/skill/mech_2401/verdict.json`, `results/skill/mech_3316/verdict.json`, seven developing storms | as Fig. 2a |
+| App. A labels | `results/fs_mechanisms_v2.npy` | `graphcast_sae.atlas.label_mechanisms_v2` on the i.i.d. dump (`graphcast_sae.extraction.extract_iid_dump`) |
+| 1,500 km disk, saturation by 750 km | `python -m graphcast_sae.storms.conv_radius_sweep_analyze` → `results/skill/conv_radius_sweep.json` | `MECH_RES=conv_r<R>` storm runs (not shipped) |
+| Random-direction controls, run-to-run floor | `results/skill/dirs_j2`, `results/skill/determinism_j4` | `scripts/rev_j2.sbatch`, `scripts/rev_j4.sbatch` |
 
-## Camera-ready revision runs (J1–J7)
-
-GPU jobs run after review under `docs/prereg/prereg_cluster_revision.md` (pass/fail bars
-committed before any run) and its amendments 1–6; J1–J7 results are summarised in
-`docs/notes/result_cluster_revision_2026_10_12.md`, J8 in `docs/notes/result_j8_2026_10_20.md`. Launchers: `scripts/rev_env.sh` +
-`scripts/rev_j*.sbatch` (submit from the repository root). All but J4 use deterministic GPU ops.
-
-| job | what | scorer | result |
-|---|---|---|---|
-| J1 (+J3) | convection gain sweep α ∈ {0, 0.5, 1, 1.25, 1.5, 2, 2.5, 3}, in-box control at every gain; TC feature read before the patch | `MECH_RES=suff_ctl storms.rev_analyze j1` | `results/skill/suff_ctl/rev_verdict.json` |
-| J2 | random and difference-of-means directions | `MECH_RES=dirs_j2 storms.rev_analyze j2` | `results/skill/dirs_j2/rev_verdict.json` |
-| J4 | run-to-run floor (5 replicates, default GPU ops) | `MECH_RES=determinism_j4 storms.rev_analyze j4` | `results/skill/determinism_j4/rev_verdict.json` |
-| J6 | feature 2954, zero vs mean ablation | `gridlock.global_rmse_ablate` | `results/fs_j6_ablation_type.npy` |
-| Fig. 2b, 2c | J1 for the single features 2401 and 3316: gains 0–3, each with three controls matched per storm on core activation (`storms.core_control_single` → `results/core_control_{2401,3316}_c{0,1,2}.json`), each scaled on its own at every gain, control curve = their mean; seven storms | `rev_fig2.sbatch` (56 tasks: feature × storm × {feature, 3 controls}) | `results/skill/fig2_{2401,3316}/`, `fig2_{2401,3316}_c{0,1,2}/` |
-| J8 | single-feature gain sweeps, 2401 and 3316 separately, gains 0–3, control at every gain, seven storms (amendments 4–6) | `rev_analyze.arm_metrics` on the cluster (causal-graphcast layout); gates in the result notes | `results/skill/j8_summary.json` (deepening error, gates), `results/skill/single_feature_mslp.json` (MSLP error, Tab. 1, 3) |
-| J7 | J1 on five Southern Hemisphere storms | `SKILL_STORMS=skill_sh_storms MECH_RES=sh_suff_ctl storms.rev_analyze j1` | `results/skill/sh_suff_ctl/rev_verdict.json` |
-
-**Single-feature amplification numbers (Tab. 1, Tab. 3, abstract, Sec. 3).** `python -m
-graphcast_sae.storms.single_feature_tables` → `results/skill/single_feature_tables.json` gives the
-best-α improvement per storm (2401: median 51 %, 2–75 %; 3316: median 42 %, 15–71 %), the α = 3
-column and the leave-one-out scaling factors and errors (2401: 7.4 hPa, α 1.5–2.5; 3316: 2.5 hPa,
-α = 3). Its input `results/skill/single_feature_mslp.json` was transcribed from the J8 cluster runs;
-the per-run rollouts (`run_*.npy`) are not shipped (see its `provenance` field). Ida and Haishen
-agree with the shipped `results/skill/fig2_2401/` and `results/skill/gain_3316/` within 0.3 hPa.
-The bias correction in Tab. 3 (median 2.3 hPa) is `python -m graphcast_sae.storms.offset_baseline`
-→ `results/skill/offset_baseline.json`, from the shipped `results/skill/convection/` runs.
-
-J8's preregistered bar was on deepening error, not MSLP error, and is reported in the notes as
-written: f2401 fails (4/7); f3316 passes 6/7 descriptively but 3/7 under amendment 5, so that
-claim is not made. Amendment 6 (re-run on the original instrument) has no result note.
-
-`storms.offmanifold_check` compares the steered codes with the i.i.d. catalog maximum
-(`results/offmanifold_check.json`). On an Alliance cluster, `GC_SCRATCH=<scratch> bash scripts/setup_rorqual.sh` (login node) builds `.venv-jax`, downloads the GraphCast checkpoint and stats, and stages ERA5; then `sbatch` the job. Clusters without internet: stage ERA5 with
-`extraction.stage_era5_local` and set `FS_ERA5_LOCAL`.
-
-Other camera-ready inputs: five-angle grid-lock scores (`results/fs_rotation_all*.npy`,
-`gridlock.rotation_angles_summary`, `scripts/rot_angles.sh`); the six grid-locked features
-against matched controls (`results/fs_matched_rmse_six.npy`, `matched_controls_six.json`,
-`scripts/ablate_six.sh`); the 16 concept-group batteries (`results/skill/mech_*`, `moisture`);
-core firing and core-matched controls (`results/fs_core_scan.npy`, `core_control*.json`,
-`results/skill/conv_corectl{2,4}`); in-box controls (`results/inbox_control_*.json`); the
-disk-radius sweep (`results/skill/conv_radius_sweep.json`); HRES / best track
-(`results/hres_compare.npy`).
-
-App. Fig. 4 (grid-locked effects, six features × seven fields) and App. Fig. 5 (the same
-features as a per-gridpoint $z_{500}$ error map) are in the appendix table below.
-
-The Ida genesis knockout that selects Fig. 3's groups and gives the internal-readout numbers
-(convection −41 %, low-level spin −54 %, moisture +3 %, shear +3 %, all four −80 %; f3316 alone
-−45 %) is `results/fs_ida_genesis_v2.npy` / `_followup.npy` / `_verdict.json`, with the record in
-`docs/notes/result_ida_genesis_calibrated_2026_08_29.md`.
-
-**Not in the current draft.** Earlier drafts also carried a SAVAR calibration figure
-(`figures/main_claims/figure1_causal_discovery_notitle.pdf`, `savar/`), the observational
-PCMCI+ graph over feature groups (`figures/paper_fig_graphmap.py`, `graphcast_sae/obsgraph/`,
-`results/fs_graphmap_inputs.npy`) and hurricane tracks under convection ablation
-(`figures/paper_fig_tracks.pdf`, `figures/paper_fig_track.py`). Their code and shipped result
-bundles are retained but no longer referenced by the paper, the same status as
-`graphcast_sae/heatdome/`.
-
-Appendix experiments (parity family, sparsity-budget competition and mediation, receptive field
-and local aggregate, hybrid PCMCI+ null, skill decomposition) live in `graphcast_sae/appendix/`
-and `graphcast_sae/obsgraph/`; each group's `README.md` lists its scripts in run order and each
-script's docstring gives the exact command. Pre-registrations are in `docs/prereg/`.
-
-| appendix figure | from shipped files | re-run |
-|---|---|---|
-| App. Fig. 4 — removing grid-locked features, six features × seven fields | `figures/paper_fig_gridlocked_effects.pdf` (shipped as rendered); notebook part 4 for the tables | `python figures/paper_fig_gridlocked_effects.py` (cartopy) reads `results/fs_matched_rmse.npy` (shipped) plus the rotation-angle scores and `hybrid_footprint_fires.npz` (not shipped). Lane: `gridlock.gridlock_score_all` (dump, ~30 min) → `footprint_inspect` / `footprints_extra` → `matched_control_draw` → GPU `gridlock.global_rmse_ablate` (8 ICs × 120 h per arm, several GPU-h) → `footprint_masks` → GPU `footprint_rmse` → `footprint_rmse_analyze`; positional tests `gridlock.rotation_all` |
-| App. Fig. 5 — grid-locked features as a per-gridpoint $z_{500}$ error map (+48 h), one shared colour scale | `figures/paper_fig_gridlocked_effects_z500map.pdf` (shipped as rendered) | `python figures/paper_fig_gridlocked_effects_z500map.py` (cartopy) needs `results/gridlock_z500_perfeat_field.npy` (per-gridpoint field, ~0.35 GB, **not shipped**), `results/hybrid_footprint_fires.npz` and the rotation-angle scores (not shipped); `data/mesh_2to6_geom.npy` and `data/fs_footprint_fires_nw12.npz` ship |
-
-## Curated inputs shipped as-is
-
-Read by scripts or figure builders here, produced by the analysis pipeline that is not included:
-
-| file | what it is | read by |
-|---|---|---|
-| `results/fs_graphmap_inputs.npy` | consensus graph (`flag_gint.npy`, `leiden_flag` member) + residual-edge set | `paper_fig_graphmap.py` |
-| `results/fs_contrast_inputs.npy` | bundle of the RESPOP run (regenerable, see above) | `paper_fig_contrast.py` |
-| `results/fields8_track.npy` | per-storm field snapshots | `paper_fig_replic.py` |
-| `results/fs_global_rmse_topamp.npy`, `fs_perfeat_rmse.npy`, `fs_feature_magnitude_stats.npy` | per-feature ablation summaries of the grid-lock lane | `notebooks/demo.ipynb` |
-| `results/land_sea_mask_025.npz` | 0.25° land-sea mask | `paper_fig_ida_dialup.py` |
-| `data/fs_footprint_fires_nw12.npz`, `data/mesh_2to6_geom.npy` | per-feature firing footprints over 12 dates; M6 mesh geometry | figures, `gridlock/`, `obsgraph/` |
-| `results/heatdome/physics_verdict.json` | heat-dome verdict (regenerable via `heatdome/`; not in the paper) | notebook |
-| `figures/paper_fig_gridlocked_effects.pdf`, `figures/paper_fig_gridlocked_effects_z500map.pdf` | App. Figs. 4 and 5, shipped as rendered (rotation-angle scores, `hybrid_footprint_fires.npz` and the per-gridpoint field are not included) | — |
-| `figures/paper_fig_tracks.pdf` | hurricane tracks, shipped as rendered; not in the current draft (`fields_conv` runs not included) | — |
-
-Not shipped and not written here (each script's `Inputs:` line flags them): `results/flag_gint*`,
-`flag_signature_physics.npy`, `litext_gc_*` (the Sec. 4 estimator lane); `hybrid_footprint_fires.npz`;
-`fs_pcmci_nodes.npy`; `fs_ida_{castsel,mechfeats,trop}.npy`; `fs_deleted_norm.npy`;
-`fs_concept_rmse.npy`; the `legacy/` steering outputs. Where a script needs one, the paper number
-it supports is read from a shipped verdict or bundle instead.
+Cluster setup: `GC_SCRATCH=<scratch> bash scripts/setup_rorqual.sh`, then `sbatch` a launcher;
+`scripts/rev_env.sh` holds the shared environment. Pre-registrations are in `docs/prereg/`.

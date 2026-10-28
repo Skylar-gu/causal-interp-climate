@@ -1,4 +1,4 @@
-"""Every path-like reference in docs/REPRODUCE.md and the group READMEs must exist (or be marked regenerable)."""
+"""Every path-like reference in docs/REPRODUCE.md must exist (or be marked as not shipped)."""
 import re, pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 docs = [ROOT / "docs/REPRODUCE.md"] + sorted(ROOT.glob("graphcast_sae/*/README.md"))

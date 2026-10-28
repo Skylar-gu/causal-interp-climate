@@ -1,7 +1,6 @@
 """Configurable overlay on the frozen TC registry. Nothing in `skill_conv_storms` changes.
 
-Two knobs, both env-driven, both added 2026-08-21 in response to
-`docs/notes/result_normal_reference_2026_08_21.md`:
+Two knobs, both env-driven, added 2026-08-21:
 
 CONV_ANALOG_SPAN=<days>
     Widen the `normal` reference from five same-calendar-date analogues to every date
@@ -23,7 +22,7 @@ is re-exported unchanged so the medians stay comparable.
 
     SKILL_STORMS=skill_conv_storms_cfg CONV_ANALOG_SPAN=9 ...
 
-Paper: Table tab:mechanism-interventions (env overlay on the registry)
+Paper: Sec. 3.2 (env overlay on the storm registry)
 Inputs: WeatherBench2 ERA5 (GCS, streamed)
 Outputs: printed report
 Run:   # JAX env, CPU

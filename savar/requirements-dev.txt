@@ -1,2 +1,0 @@
-# Dev/test dependencies (in addition to requirements.txt)
-pytest==8.4.2

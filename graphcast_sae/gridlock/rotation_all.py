@@ -15,7 +15,7 @@ column, giving a positional score with no proxy in between:
 
 Positive means the feature stayed on the mesh while the planet moved under it.
 
-Paper: Sec. 3, grid-locked-feature ablations (demo notebook part 4)
+Paper: App. C (longitude-rotation test behind s_f)
 Inputs: GraphCast params (GRAPHCAST_PARAMS)
 Outputs: results/fs_rotation_all.npy
 Run:   # JAX env, CPU

@@ -50,7 +50,7 @@ DEVIATION from v1, declared: 24 dump windows here against v1's 60, so that the
 null costs the same reads as the estimate. The observed z is correlated against
 v1's stored z and that correlation is printed as a gate.
 
-Paper: Sec. 3 (calibrated mechanism labels; figures/paper_fig_exposure.py)
+Paper: App. A (calibrated labels: 127-rotation null, BH-FDR, 2.7% null rate) -> intervention groups
 Inputs: results/fs_ida_mechfeats.npy (not shipped, see docs/REPRODUCE.md); WeatherBench2 ERA5 (GCS, streamed); i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_mechanisms_v2.npy
 Run:   # JAX env, CPU

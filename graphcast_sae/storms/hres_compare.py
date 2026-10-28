@@ -20,7 +20,7 @@ WHAT IS AND IS NOT FAIR HERE
   Best-track minima are printed alongside so the reanalysis gap stays visible.
 - Four of the seven storms predate the HRES archive (2016) and are omitted.
 
-Paper: Appendix app:taxonomy (GraphCast vs IFS-HRES on the storm box)
+Paper: Sec. 5 (ERA5 vs best-track minimum pressure for the seven storms)
 Inputs: results/skill/convection/era5_truth.npy (shipped); results/skill/convection/verdict.json (shipped); WeatherBench2 ERA5 (GCS, streamed)
 Outputs: results/hres_compare.npy
 Run:   # JAX env, CPU

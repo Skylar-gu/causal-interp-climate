@@ -1,7 +1,7 @@
 """Follow-up to steer_ida_genesis_v2 (prereg amendment 2): single-feature decomposition of the
 vorticity and convection groups, plus the original (39c8e9b) vorticity group 3861/2514/2089, same protocol.
 
-Paper: Sec. 3.3; docs/notes/result_ida_genesis_calibrated_2026_08_29.md (3316 alone carries 83% of the spin effect)
+Paper: Fig. 3 (single-feature decomposition of the vorticity group)
 Inputs: GraphCast params (GRAPHCAST_PARAMS); results/fs_ida_genesis_v2.npy (the groups)
 Outputs: results/fs_ida_genesis_v2_followup.npy
 Run:   # JAX env, GPU (~46 GB), ~3 min

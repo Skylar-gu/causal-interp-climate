@@ -210,7 +210,7 @@ class SAEJax:
         of the SAME process, f'[:,j] == fref == f[:,j] elementwise, so f'-f is exactly the
         zero matrix and delta is exactly zero. The clamp is therefore a no-op on the
         baseline trajectory by construction; any residual is the GPU nondeterminism floor
-        (docs/notes/nondeterminism_floor_2026_08_20.md), and measuring it against a jmask=0 arm
+        (measured by J4), and measuring it against a jmask=0 arm
         of the same graph is the correctness test that must pass before any mediation
         number is quoted."""
         f = self.codes(x)

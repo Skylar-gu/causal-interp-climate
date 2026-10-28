@@ -10,7 +10,7 @@ Same encoder, same windows, same accumulation as footprint_inspect, so the count
 directly comparable and can be merged into one figure. Writes a SEPARATE file rather than
 extending results/fs_footprints.npy, which another lane owns.
 
-Paper: figures/paper_fig_maps.py (convection-group footprints)
+Paper: Sec. 3.1 / App. C (extra footprints, input to the matched controls)
 Inputs: i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_footprints_extra.npy
 Run:   # JAX env, CPU

@@ -11,7 +11,7 @@ finiteness on what it loads, so a missing frame fails loudly instead of silently
 Run on a node WITH internet (login/DTN). Network-bound; stdlib only.
 
 Read by fs_common.load_block when FS_ERA5_LOCAL points at the output.
-Paper: none directly (input staging for the revision runs)
+Paper: infrastructure: ERA5 staging for clusters without internet
 Inputs: WeatherBench2 ERA5 (public HTTPS)
 Outputs: a sparse zarr at --out
 """

@@ -12,7 +12,7 @@ Pipeline per candidate:
 
 Run (savar venv):
 
-Paper: shared: deseasonalisation and consensus helpers for the observational graph
+Paper: shared: deseasonalisation helper used by signature_physics
 Inputs: candidates/pool_v2_candidates.npy (not shipped, see docs/REPRODUCE.md)
 Outputs: results/litext_gc_gint.npy (--out, when run as a script)
 Run:   # demo env (numpy/scipy/matplotlib)

@@ -11,7 +11,7 @@ failure, and is far better than shipping a control that could not have failed.
 
 Superseded by core_control_all.py (this script's zero-target gate matched only 3 of 7 storms);
 kept because conv_corectl2 was drawn with it.
-Paper: Sec. 3.3 / App. B (core-matched control)
+Paper: App. B (core-matched controls, shared helpers)
 Inputs: results/fs_core_scan.npy
 Outputs: results/core_control.json
 Run:   # JAX env, CPU

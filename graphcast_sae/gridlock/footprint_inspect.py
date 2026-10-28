@@ -20,7 +20,7 @@ It also writes the footprints so they can be plotted and checked by eye, because
 count is only as good as the adjacency threshold and the map shows immediately whether the
 number matches what is actually there.
 
-Paper: figures/paper_fig_maps.py / paper_fig_gain.py (results/fs_footprints.npy)
+Paper: Sec. 3.1 / App. C (feature footprints, input to the matched controls)
 Inputs: results/fs_atlas_extra.npy (not shipped, see docs/REPRODUCE.md); results/fs_mesh_detectors.npy (not shipped, see docs/REPRODUCE.md); i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_footprints.npy
 Run:   # JAX env, CPU

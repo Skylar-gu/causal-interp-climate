@@ -29,7 +29,7 @@ matching AXIS and nothing else:
     RANDOM_CTRL, so the new control is genuinely independent of both
   - drawn with a fixed seed and written to disk BEFORE any arm runs
 
-Paper: Table tab:mechanism-interventions (in-box-matched random control)
+Paper: App. B (in-box-matched random control; J1, J4, J7, J8)
 Inputs: i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/inbox_control_<registry module>.json
 Run:   # JAX env, CPU

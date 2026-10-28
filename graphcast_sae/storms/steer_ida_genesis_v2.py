@@ -6,7 +6,7 @@ box. Moisture / vorticity / shear groups are the three strongest rotation-null-c
 each mechanism (z > 0 on its own probe, in-box exposure >= half the weakest convection member,
 ranked by z); three exposure-matched random controls and a repeat baseline (nondeterminism floor).
 
-Paper: Sec. 3.3 (genesis ingredients on the model's cyclone feature); docs/notes/result_ida_genesis_calibrated_2026_08_29.md
+Paper: Fig. 3 (genesis-ingredient knockout that selects the groups)
 Prereg: docs/prereg/prereg_ida_genesis_calibrated.md (+ amendments 1, 2 inside it)
 Inputs: GraphCast params (GRAPHCAST_PARAMS); results/fs_mechanisms_v2.npy (shipped); data/mesh_2to6_geom.npy
 Outputs: results/fs_ida_genesis_v2.npy  (scored by ida_genesis_v2_analyze.py -> results/fs_ida_genesis_v2_verdict.json)

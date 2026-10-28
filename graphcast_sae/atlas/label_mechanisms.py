@@ -9,7 +9,7 @@ For each feature f and mechanism m: z[f,m] = mean over f's ACTIVE nodes of the p
 standardized m. Large +z => the feature fires where that mechanism is anomalously strong => it
 "is" that mechanism. Runs in the JAX env (needs gcsfs/xarray); numpy SAE encode (no torch).
 
-Paper: Sec. 3 (v1 labels; superseded by label_mechanisms_v2, kept because results/fs_mechanisms.npy ships)
+Paper: App. A (estimator shared with label_mechanisms_v2; results/fs_mechanisms.npy)
 Inputs: candidates/fs_feature_catalog.npy (not shipped, see docs/REPRODUCE.md); results/fs_ida_trop.npy (not shipped, see docs/REPRODUCE.md); WeatherBench2 ERA5 (GCS, streamed); i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: results/fs_mechanisms.npy
 Run:   # JAX env, CPU

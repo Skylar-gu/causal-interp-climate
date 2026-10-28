@@ -11,7 +11,7 @@ Also re-rolls the free-running baseline here so the two curves are strictly comp
 (same code path, same session). Writes tc_truth / tc_truth_mid / tc_freecheck into
 results/fs_ida_mechmaps_prog<TAG>.npy in place; every existing key is preserved.
 
-Paper: Fig. 3 ERA5-forced row and its +48 h value 213 (figures/paper_fig_ida_dialup.py reads tc_truth).
+Paper: Fig. 3 ERA5-forced row and its +48 h value 213 (figures/fig3_ida_dialup.py reads tc_truth).
 The shipped results/fs_ida_mechmaps_prog_v2.npy predates this run and has no tc_truth key.
 Run:   # JAX env, GPU (~46 GB)
     FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false python -m graphcast_sae.storms.ida_mechmaps_truth

@@ -11,7 +11,7 @@ Figures (figures/): skill_conv_trajectories.png (per-storm MSLP & wind vs lead, 
 skill_conv_summary.png (Delta-deepening & Delta-skill bars, conv vs controls), and
 skill_conv_colocation.png (mid-intensification node overlay: convection 2401 firing on the TC low).
 
-Paper: Sec. 3 'The intervention contrast' (Table tab:mechanism-interventions)
+Paper: Fig. 2a, Sec. 3.2 (restore-to-normal deepening removed)
 Inputs: none beyond the arguments above
 Outputs: results/skill/<MECH_RES|convection>/verdict.json; figures/skill_<tag>_{trajectories,summary,colocation}.png
 Run:   # JAX env, CPU

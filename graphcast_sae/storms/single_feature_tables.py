@@ -1,8 +1,8 @@
 """Single-feature amplification numbers (camera-ready Table 1, Table 3 feature columns, Sec. 3 text).
 
 Reads results/skill/single_feature_mslp.json: MSLP error (hPa) per gain x storm for features 2401
-(convection) and 3316 (low-level vorticity), from the J8 gain sweeps (docs/prereg amendments 4-6,
-docs/notes/result_j8_*.md). The per-run rollouts are not shipped; the table was transcribed from
+(convection) and 3316 (low-level vorticity), from the J8 gain sweeps (docs/prereg amendments 4-6).
+The per-run rollouts are not shipped; the table was transcribed from
 the cluster runs, see the file's "provenance" field. Gain 1 is the unmodified forecast.
 
   best-alpha improvement: (unmodified - min over gains) / unmodified, per storm (Table 1, abstract)

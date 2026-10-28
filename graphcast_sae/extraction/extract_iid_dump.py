@@ -7,7 +7,7 @@ clustering and the SAE-cluster member. GPU, ~4 s/window.
 
     FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false \
 
-Paper: infrastructure: the 160-window i.i.d. layer-8 dump (GC_SCRATCH/fs_iid_dump.npy) every atlas/gridlock/concept script reads
+Paper: infrastructure: the 160-window i.i.d. layer-8 dump (GC_SCRATCH/fs_iid_dump.npy) the labels and grid-lock scores read
 Inputs: GraphCast params (GRAPHCAST_PARAMS); WeatherBench2 ERA5 (GCS, streamed); i.i.d. dump (GC_SCRATCH/fs_iid_dump.npy, extraction/extract_iid_dump.py)
 Outputs: $GC_SCRATCH/fs_iid_dump.npy + fs_iid_meta.json; status out/fs_iid_status.txt
 Run:   # JAX env, GPU (~46 GB)

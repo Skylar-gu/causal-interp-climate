@@ -8,7 +8,7 @@ radius-independent) that lies inside the disk, normalised to the largest (2500 k
 
 Writes results/skill/conv_radius_sweep.json and figures/conv_radius_sweep.png.
 
-Paper: Sec. 3 (1500 km disk justification)
+Paper: Sec. 2 (1500 km disk; the effect saturates by 750 km)
 Inputs: results/skill/convection (shipped)
 Outputs: figures/conv_radius_sweep.png; results/skill/conv_radius_sweep.json
 Run:   # JAX env, CPU

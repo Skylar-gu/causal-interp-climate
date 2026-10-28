@@ -33,7 +33,7 @@ mesh nodes with a raw comparison against box["lon"] on a -180..180 grid, which r
 EMPTY box for any dateline-crossing box. Winston's storm sits at 174-175 E, so the east edge
 is trimmed to 179.9 -- this loses no part of the track and avoids the wrap entirely.
 
-Paper: not in the paper (Southern-Hemisphere registry)
+Paper: Table 2 (Southern-Hemisphere storm registry)
 Inputs: WeatherBench2 ERA5 (GCS, streamed)
 Outputs: printed report
 Run:   # JAX env, CPU

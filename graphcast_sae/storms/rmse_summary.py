@@ -10,7 +10,7 @@ Floor. J4 measured the largest per-step difference between identical runs, 0.20 
 (`traj_max_hpa`); an arm's RMSE moves by at most that much, so a difference of two arms has a
 floor of 2 x 0.20 = 0.40 hPa (the same doubling as the 0.25 hPa deepening floor).
 
-Paper: Table tab:ledger, Sec. 3.2-3.3, abstract and conclusion percentages
+Paper: Sec. 3.2 (group-level MSLP-error summary; input to offset_baseline)
 Inputs: results/skill/{suff_ctl,sh_suff_ctl,dirs_j2,determinism_j4}/rev_verdict.json,
         results/skill/gain_3316/ (shipped)
 Outputs: results/rmse_summary.json

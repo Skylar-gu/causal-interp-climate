@@ -29,7 +29,7 @@ arm-vs-baseline alone.
 
     FS_DEVICE=gpu XLA_PYTHON_CLIENT_PREALLOCATE=false \
 
-Paper: Sec. 3 grid-lock ablations (results/fs_global_rmse.npy; demo notebook part 4)
+Paper: Sec. 3.1, Fig. 1, Fig. 4 (global RMSE under feature ablation; the 1.50 m)
 Inputs: GraphCast params (GRAPHCAST_PARAMS)
 Outputs: out/global_rmse_status.txt; results/fs_global_rmse.npy
 Run:   # JAX env, GPU (~46 GB)

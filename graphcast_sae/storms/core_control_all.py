@@ -25,7 +25,7 @@ nondev2013 still gets no control and should not: all three convection features a
 its core AND zero in its box, so there is nothing to ablate and nothing to match. Coverage
 tops out at 7 of 8, not 8 of 8.
 
-Paper: Table tab:mechanism-interventions (core-matched control)
+Paper: App. B (core-matched controls, shared helpers)
 Inputs: results/fs_core_scan.npy (not shipped, see docs/REPRODUCE.md)
 Outputs: results/core_control_all.json
 Run:   # JAX env, CPU

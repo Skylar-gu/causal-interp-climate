@@ -9,7 +9,7 @@ and differ only in what the convection features are set to INSIDE that disk:
 If 'normal' still suppresses the cyclone feature -> Ida's OWN anomalous convection is necessary.
 If 'normal' looks like baseline -> the background sufficed; the excess was incidental.
 
-Paper: Fig. 5 and Table tab:mechanism-interventions (the restore-to-normal counterfactual every storm run reuses)
+Paper: Sec. 2 (f_normal: the storm-free reference every storm run reuses)
 Inputs: GraphCast params (GRAPHCAST_PARAMS)
 Outputs: results/fs_ida_counterfactual.npy
 Run:   # JAX env, GPU (~46 GB)

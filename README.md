@@ -1,4 +1,7 @@
-# Causal discovery and interventions inside weather forecasting models 
+# Causal discovery and interventions inside weather forecasting models
+
+Code for **Auditing Learned Dynamics in Weather Models** (NeurIPS 2026 workshop, Interpretability
+for Discovery). `docs/REPRODUCE.md` maps every figure and table to its script and result file.
 
 ## Quick start — demo
 
@@ -29,17 +32,15 @@ graphcast_sae/       GraphCast SAE experiments
   atlas/             feature labelling and calibration
   storms/            tropical-cyclone interventions
   gridlock/          grid-locked feature analyses and controls
-  appendix/          supporting analyses
 
-figures/             paper figures and builders
+figures/             paper figures (fig1-fig5) and builders
+scripts/             GPU launchers
+env/                 pinned environments
 results/             curated experiment outputs
 data/                mesh geometry and feature metadata
-docs/prereg/         preregistrations
+docs/                REPRODUCE.md and preregistrations
 tests/               self-tests
 notebooks/           demo notebook
-
-savar/, graphcast_sae/{obsgraph,concepts}/, graphcast_sae/{heatdome,legacy}/
-                     additional and superseded experiments not used in the current paper
 ```
 
 ## Running the GPU experiments
