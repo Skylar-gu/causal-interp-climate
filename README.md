@@ -7,17 +7,6 @@ pip install -r requirements.txt     # demo + figure deps; GPU block is commented
 jupyter notebook notebooks/demo.ipynb     # or: run all cells
 ```
 
-`notebooks/demo.ipynb` runs on **CPU in a few minutes** and regenerates, from the
-result files shipped here:
-
-1. the Ida dial-up progression figure (each calibrated genesis-ingredient group
-   doubled, watched on the model's internal cyclone feature at +12/+24/+36/+48 h),
-2. the seven-storm mechanism-ablation table (deepening lost vs ERA5) for the
-   convection triplet, the low-level-spin group, and the moisture group,
-3. the gain-sweep curves for the convection- and vorticity-associated features (Ida / Haishen / Patricia),
-4. the grid-locked features: world maps of their footprints, single-feature and
-   group ablation tables against matched controls,
-
 
 ## Repository structure
 
